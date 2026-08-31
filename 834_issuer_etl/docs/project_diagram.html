@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>834 Issuer ETL — Project Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; background: #f5f5f5; }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 40px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+    .box { background: #fff; border-radius: 8px; padding: 20px; margin: 16px 0; box-shadow: 0 1px 4px rgba(0,0,0,.1); overflow-x: auto; }
+    .hint { background: #e8f4fd; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
+    .mermaid { text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>834 Issuer ETL — Whole Project Diagram</h1>
+  <div class="hint">
+    <strong>How to open:</strong> Double-click this file, or drag it into Chrome / Edge / Firefox.
+    No install needed. If diagrams are blank, check internet (Mermaid loads from CDN).
+  </div>
+
+  <h2>1. Master architecture (end-to-end)</h2>
+  <div class="box">
+    <pre class="mermaid">
+flowchart TB
+    subgraph ext [External]
+        SFTP[SFTP Server /archive/in/good/834]
+        ENV[.env credentials and filters]
+    end
+
+    subgraph entry [Entry points]
+        MAIN[main.py primary]
+        RUN[run.py]
+        VAL[run_validation.py]
+        KPI[run_kpi_reports.py]
+    end
+
+    subgraph sftp_layer [SFTP ingestion]
+        CLASS[sftp_file_classifier]
+        WALK[sftp_tree_walk recursive]
+        DOWN[sftp_ingestion download]
+        AUDIT[sftp_audit scan only]
+        CLASS --> WALK
+        WALK --> DOWN
+        WALK --> AUDIT
+    end
+
+    subgraph conn [connectors]
+        LOCAL[LocalSourceConnector]
+        SFTPc[SFTPSourceConnector]
+    end
+
+    subgraph input [source_data flat monthly]
+        SD[issuer year month xml files]
+    end
+
+    subgraph pipe [pipeline orchestrator]
+        S1[1 ingest and load]
+        S2[2 reconcile]
+        S3[3 validate]
+        S4[4 report]
+        S5[5 export assets]
+        S1 --> S2 --> S3 --> S4 --> S5
+    end
+
+    subgraph parse_db [Parse and database]
+        P834[parser_834.py]
+        LOAD[loaders.py]
+        DB[(issuer_834.db)]
+        P834 --> LOAD --> DB
+    end
+
+    subgraph recon [reconciliation]
+        R[premium fees 90-day rules KPIs]
+    end
+
+    subgraph out [Outputs]
+        RPT[reports validation and kpi]
+        CSV[reports sftp_audit csv]
+        AST[assets per month and rollups]
+    end
+
+    ENV --> MAIN
+    MAIN --> pipe
+    SFTP --> SFTPc
+    SFTPc --> DOWN --> SD
+    SFTPc --> AUDIT --> CSV
+    SFTPc --> LOCAL
+    SD --> LOCAL
+    LOCAL --> S1
+    S1 --> parse_db
+    S2 --> recon
+    S3 --> RPT
+    S4 --> RPT
+    S5 --> AST
+    </pre>
+  </div>
+
+  <h2>2. SFTP remote vs local (flattening)</h2>
+  <div class="box">
+    <pre class="mermaid">
+flowchart LR
+    subgraph remote [Remote SFTP variable depth]
+        R1[issuer year month]
+        R2[day folder]
+        R3[batch folder]
+        R4[valid xml or xml.gz]
+        R1 --> R2 --> R3 --> R4
+    end
+
+    subgraph local [Local source_data flat]
+        L1[issuer year month]
+        L2[xml files only]
+        L1 --> L2
+    end
+
+    R4 -->|download or gunzip| L2
+    </pre>
+  </div>
+
+  <h2>3. Processing modes</h2>
+  <div class="box">
+    <pre class="mermaid">
+flowchart TD
+    START[python main.py] --> MODE{PROCESSING_MODE}
+    MODE -->|local| LOC[scan source_data only]
+    MODE -->|sftp| AUDIT{SFTP_AUDIT_ONLY}
+    AUDIT -->|true| SCAN[recursive audit to CSV]
+    AUDIT -->|false| DL[download flatten then pipeline]
+    LOC --> FULL[parse reconcile validate report assets]
+    DL --> FULL
+    SCAN --> END[exit no parser]
+    </pre>
+  </div>
+
+  <h2>4. Pipeline stages</h2>
+  <div class="box">
+    <pre class="mermaid">
+flowchart LR
+    A[0 SFTP optional] --> B[1 Discover files]
+    B --> C[2 Parse and load SQLite]
+    C --> D[3 Reconcile]
+    D --> E[4 Validate]
+    E --> F[5 Reports]
+    F --> G[6 Assets export]
+    </pre>
+  </div>
+
+  <h2>5. Project folder map (text)</h2>
+  <div class="box">
+<pre>834_issuer_etl/
+├── main.py                 ← RUN THIS
+├── run.py                  ← same as main.py
+├── .env                    ← PROCESSING_MODE, SFTP_*, filters
+├── config/                 ← settings
+├── connectors/             ← local | sftp | ftp
+├── ingestion/              ← discovery + SFTP walk/download/audit
+├── parsers/parser_834.py
+├── database/               ← SQLite schema + loaders
+├── validation/
+├── reconciliation/         ← premiums, fees, 90-day rules
+├── reporting/
+├── pipeline/orchestrator.py
+├── source_data/            ← INPUT flat monthly XML
+├── data/issuer_834.db
+├── reports/
+├── assets/
+└── src/                    ← LEGACY do not use</pre>
+  </div>
+
+  <h2>6. SFTP path example</h2>
+  <div class="box">
+<pre>REMOTE:
+/archive/in/good/834/82824/2026/04/10/3709055_13201095595/from_82824_GA_834_INDV_20260410153000.xml
+
+LOCAL (flat):
+source_data/82824/2026/04/from_82824_GA_834_INDV_20260410153000.xml</pre>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "default",
+      securityLevel: "loose",
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" }
+    });
+  </script>
+</body>
+</html>

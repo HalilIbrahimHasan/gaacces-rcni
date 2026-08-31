@@ -1,0 +1,17 @@
+mkdir /opt/tibco/data/inProcess/1_976202207014
+Started processing the outbound file: /opt/tibco/data/fromGHIX/X220A1/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT
+Moved /opt/tibco/data/fromGHIX/X220A1/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT to /opt/tibco/data/inProcess/1_976202207014/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT
+Renaming file to match file naming convention expected by the trading partner.
+move /opt/tibco/data/inProcess/1_976202207014/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT /opt/tibco/data/inProcess/1_976202207014/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT.good
+Copying the file to the target interface at 2026-07-09T16:23:45 
+with a suffix appended to the name to indicate to the target
+system not to pick up the file yet since it's in transit...
+copy /opt/tibco/data/inProcess/1_976202207014/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT.good /opt/sftp/Carriers/37301/out/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT.good
+Renaming the file at the target interface at 2026-07-09T16:23:45
+to remove the suffix from the filename so it can get picked up...
+move /opt/sftp/Carriers/37301/out/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT.good /opt/sftp/Carriers/37301/out/to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT
+Archiving the inProcess workfolder data at 2026-07-09T16:23:45...
+Created directory path /opt/tibco/data/archive/out/good/PAS/37301/2026/07/09
+move /opt/tibco/data/inProcess/1_976202207014 /opt/tibco/data/archive/out/good/PAS/37301/2026/07/09/1_976202207014
+INFO: HIOS_Issuer_ID 37301 (EMI Health)
+File "to_37301_INDV_MONTHLYDISCREPANCY_2026_20260709122334.OUT" from directory /opt/tibco/data/inProcess/1_976202207014 moved to /opt/tibco/data/archive/out/good/PAS/37301/2026/07/09/1_976202207014.

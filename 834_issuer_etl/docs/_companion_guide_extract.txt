@@ -1,0 +1,6320 @@
+
+--- PAGE 1 ---
+            
+These materials are GetInsured work product and are intended solely for Client’s use. 
+ 
+© GetInsured 2023 All Rights Reserved.         1 
+ 
+ 
+The GetInsured State-Based Exchange (SBE) Platform 
+834 Companion Guide 
+Version for Release 23.09.00 
+August 31, 2023 
+  
+
+--- PAGE 2 ---
+© GetInsured 2023 All Rights Reserved.         2 
+1. Introduction 5 
+1.1. Background 5 
+2. Business Purpose 6 
+3. File Naming Conventions 7 
+4. File Transfer Process 7 
+5. Acknowledgements and Business Edits 8 
+5.1. TA1 Interchange Acknowledgment 8 
+5.2. 999 Functional Acknowledgments 11 
+6. Subscribers / Non-Subscriber Enrollees 15 
+7. Uppercase Letters, Special Characters, and Delimiters 15 
+8. Individual Transactions 16 
+9. Control Segments / Envelopes 16 
+10. The Exchange Business Rules and Limitations 20 
+10.1. General Business Rules Exceptions 20 
+10.2. Individual Market Rate Calculations Exceptions 20 
+11. The Exchange To Issuer Business Scenarios For 834 21 
+11.1. Initial Enrollment Supplemental Instructions 21 
+11.1.1. 2750 Loop Reporting Category Values 38 
+11.1.2. Custom Monthly 2750 Loops 39 
+11.1.3. Behavior of Standard 2750 Loop and Custom Monthly 2750 Loop 43 
+11.1.4. Child Only Enrollment 45 
+11.2. Cancellation Supplemental Instructions (Subscriber / Enrollment Level) 46 
+11.3. Cancellation Supplemental Instructions (Member Level) 49 
+11.4. Termination Supplemental Instructions - (Subscriber / Enrollment Level) 52 
+11.5. Termination Supplemental Instructions (Member Level) 55 
+11.6. Change Transactions - The Exchange to QHP Issuer 59 
+
+--- PAGE 3 ---
+© GetInsured 2023 All Rights Reserved.         3 
+11.7. Address Changes 60 
+11.8. Re-enrollment Supplemental Instructions 63 
+11.9. Reinstatement Supplemental Instructions 64 
+11.10. Change in Health Coverage 64 
+11.11. Change in Circumstance 65 
+11.12. Add Member - Same Plan 65 
+11.13. Add Member - Different Plan 65 
+11.14. Add / Term Dates (mid-month dates) 65 
+11.15. Disenroll Member - Same plan 66 
+11.16. QLE (Qualifying Life Event) Identifiers 66 
+11.17. SEP (Special Enrollment Period) Identifiers 66 
+11.18. Demographic Changes - Incorrect Member Information 67 
+12. Issuer to the Exchange Business Scenarios For 834 68 
+12.1. Overview of the Exchange Inbound Processing Rules 70 
+12.1.1. Inbound File Naming Convention 72 
+12.1.2. Inbound Frequency File is Sent 72 
+12.2. Enrollment Confirmation / Effectuation Supplemental Instructions 72 
+12.2.1. Inbound Confirmation Segments 73 
+12.2.2. Inbound Confirmation Sample 79 
+12.3. Issuer Cancellation Supplemental Instructions 81 
+12.3.1. Inbound Cancellation Segments 81 
+12.3.2. Inbound Cancellation Sample 87 
+12.4. Issuer Termination Supplemental Instructions 89 
+12.4.1. Inbound Termination Segments 89 
+12.4.2. Inbound Termination Sample 95 
+12.5. Other Transactions 97 
+
+--- PAGE 4 ---
+© GetInsured 2023 All Rights Reserved.         4 
+13. Annual Renewals 98 
+13.1. Individual Market 98 
+13.1.1. End of Coverage Year Terms 98 
+13.1.2. Auto Renewal ‘RENP’ Adds 98 
+13.1.3. Cross Issuer Renewals 99 
+13.1.4. Terminations for Current Coverage Year Enrollments 99 
+13.1.5. Passive Renewal (Auto Renewal) for Next Coverage Year 104 
+13.1.6. Renewal Exceptions 108 
+13.2. Renewed Enrollment Status 109 
+14. Monthly Reconciliation 109 
+15. Relationship Codes 110 
+16. Maintenance Reason Codes 111 
+16.1. Term 111 
+16.2. Add 111 
+16.3. Change 111 
+16.4. Inbound to Exchange 112 
+17. Language Codes 112 
+17.1 Spoken Language Codes 112 
+17.2 Written Language Codes 113 
+18. Race/Ethnicity Codes 113 
+19. Appendix 115 
+19.1. Initial Enrollment Sample - Exchange to Issuer 115 
+20. Document Control 118 
+ 
+ 
+
+--- PAGE 5 ---
+© GetInsured 2023 All Rights Reserved.         5 
+1. Introduction 
+This Companion Guide to the v5010 Accredited Standards Committee (ASC) X12N Implementation Guides 
+and associated errata adopted under the Health Insurance Portability and Accountability Act (HIPAA) 
+clarifies and specifies the data content when exchanging electronically with the Exchange. Transmissions 
+based on this companion guide, used in tandem with the v5010 ASC X12N Implementation Guides and the 
+CMS Standard Companion Guide Transaction, are compliant with both ASC X12 syntax and those guides. This 
+guide is intended to convey information that is within the framework of the ASC X12N Implementation 
+Guides adopted for use under HIPAA. The Companion Guide is not intended to convey information that in 
+any way exceeds the requirements or usages of data expressed in the Implementation Guides. 
+ 
+This Companion Guide is based on, and must be used in conjunction with, the ASC X12 X12N/005010X220 
+Type 3 Technical Report (TR3) and its associated A1 addenda. The Companion Guide clarifies and specifies 
+specific transmission requirements for exchanging data with the Exchange. The instructions in this 
+companion guide conform to the requirements of the TR3, ASC X12 syntax and semantic rules and the ASC 
+X12 Fair Use Requirements. In case of any conflict between this Companion Guide and the instructions in 
+the TR3, the TR3 takes precedence. 
+1.1. Background  
+The state is creating a health insurance Exchange to comply with the Affordable Care Act (ACA). The 
+Exchange will help individuals and small employers shop for, select and enroll in high quality, affordable 
+health plans that fit their needs. 
+In order for the state to run an Exchange, it must submit enrollment information to CMS according to the 
+standards they have developed. This standard will be the basis on which the Exchange will Exchange 
+information with insurance Issuers. Modifications to the CMS guide will be made where necessary. 
+This Companion Guide contains detailed information about how the Exchange will use the CMS Standard 
+Companion Guide Transaction v5.0 and the ASC X12 Benefit Enrollment and Maintenance (834) transaction, 
+based on the 005010X220 Implementation Guide and its associated 005010X220A1 addenda. 
+ 
+  
+
+--- PAGE 6 ---
+© GetInsured 2023 All Rights Reserved.         6 
+2. Business Purpose 
+The Health Insurance Portability and Accountability Act (HIPAA) requires the Exchange and all health 
+insurance Issuers to comply with the Electronic Data Interchange (EDI) standards for health care as 
+established by the Department of Health and Human Services (HHS). Those compliance standards are 
+codified in the ASC X12N 5010 version of the Technical Report Type 3 (TR3) for each transaction type. The 
+Exchange will trade the following health care transaction types: 
+● 834 Membership Enrollments 
+● TA1 Interchange Acknowledgments 
+● 999 Functional Acknowledgments 
+Where applicable, the TR3s for these transactions are available electronically from the WPC website at 
+http://www.wpc-edi.com/. This guide is to be used in conjunction with the respective TR3s and is not meant 
+to replace them. 
+The Exchange does not utilize XML based BAA files, which differs from CMS. 
+  
+
+--- PAGE 7 ---
+© GetInsured 2023 All Rights Reserved.         7 
+3. File Naming Conventions 
+The naming conventions for files transferred between the Exchange and insurance Issuers are as shown in 
+the table below. Transmission frequency is once daily for each of the Inbound to Issuer transactions, where 
+typically a maximum of one file per day is traded. Exception: Configurable by state, auto (passive) renewal 
+files are generated and sent separately, from the daily file, to the Issuer. Files which do not adhere to the file 
+naming conventions below will be ignored for security purposes.  
+ 
+Table 1. EDI File Naming Conventions 
+Transaction 
+Type 
+Type Naming Convention from/to Trading Partners 
+     from = Outbound from Issuer to Exchange  
+     to = Inbound to Issuer from Exchange 
+834 Individual 
+Enrollments 
+from_<HIOS ID>_ID_834_INDV_<CCYYMMDDHHMMSS>.edi  
+to_<HIOS ID>_ID_834_INDV_<CCYYMMDDHHMMSS>.edi 
+834 
+Auto 
+Renewal for 
+Individual 
+from_<HIOS ID>_ID_834_INDV_<CCYYMMDDHHMMSS>.edi  
+834 
+Auto 
+Renewal 
+Terms for 
+Individual1 
+to_<HIOS ID>_ID_834_INDV_RENTERM_<CCYYMMDDHHMMSS>.edi 
+TA1 Individual 
+Enrollments 
+from_<HIOS ID> _ID_TA1_834_INDV_<CCYYMMDDHHMMSS>.edi  
+to_<HIOS ID>_ID_TA1_834_INDV_<CCYYMMDDHHMMSS>.edi 
+999 Individual 
+Enrollments 
+from_<HIOS ID>_ID_999_834_INDV_<CCYYMMDDHHMMSS>.edi 
+to_<HIOS ID>_ID_999_834_INDV_<CCYYMMDDHHMMSS>.edi 
+1Note: For additional details on End of Coverage Year Terms, refer to Section 13.1.1 
+4. File Transfer Process 
+Files created by the Exchange for Issuers will be placed on the Exchange SFTP server for Issuers to retrieve. 
+Issuers will place files created by them for the Exchange on the Exchange SFTP server. Directories are /out 
+(to Issuer) and /in (to Exchange). Additional information on SFTP set up including login, where to drop files, 
+landing zone, etc. will be provided separately. 
+ 
+
+--- PAGE 8 ---
+© GetInsured 2023 All Rights Reserved.         8 
+5. Acknowledgements and Business Edits  
+EDI interchanges submitted to the Exchange are processed through compliance edits that generate 
+acknowledgments indicating the portions of data that were accepted vs. rejected. Those acknowledgment 
+files are returned to the submitter. Any data rejected at the X12 validation level will be reported back to 
+Issuers via the TA1 and 999 response files. 
+5.1. TA1 Interchange Acknowledgment 
+The Interchange or TA1 Acknowledgment is a means of replying to an interchange or transmission that has 
+been sent. The TA1 verifies the envelope only. The TA1 is a single segment and is unique in the sense that 
+this single segment is transmitted without the GS/GE envelope structure. A TA1 can be included in an 
+interchange with other functional groups and transactions. Encompassed in the TA1 are the interchange 
+control number, interchange date and time, interchange acknowledgment code, and the interchange note 
+code. 
+The interchange control number, interchange date and time are identical to those that were present in the 
+transmitted interchange from the sending trading partner. This provides the capability to associate the TA1 
+with the transmitted interchange. The TA104, interchange Acknowledgment Code, indicates the status of 
+the interchange control structure. A TA1 will be returned in two situations, 1) if requested in the ISA14 of 
+the 834 transaction OR 2) if the transaction is rejected. 
+● The Exchange expects to receive a TA1 interchange acknowledgment for every outbound 834 file 
+sent. 
+● The Exchange will send a TA1 acknowledgement for every inbound 834 file received when requested 
+in the interchange control header. 
+● The Exchange will require the request for a TA1 in the control header to be in all outbound and 
+inbound 834 data. The request for a TA1 is part of the validation process, so any 834 data without 
+this request will fail validation. 
+Example of what a TA1 report looks like (shown unwrapped):  
+ISA*00*          *00*          *ZZ*AK0            *ZZ*990299999      *210423*1238*^*00501*000000063*0*P*:~ 
+TA1*107090532*210316*0707*R*020~ 
+IEA*0*000000063~ 
+ 
+ 
+
+--- PAGE 9 ---
+© GetInsured 2023 All Rights Reserved.         9 
+Table 2. TA1 Interchange Acknowledgment Segments 
+Table or 
+Loop 
+Element Element Name Value 
+Header ISA Interchange Control Header  
+Header TA1 Interchange 
+Acknowledgement Report  
+ TA101 Interchange Control Number 
+of submitted file Reference to ISA13 of submitted 834 file 
+ TA102 Interchange Date Format YYMMDD 
+ TA103 Interchange Time Format HHMM 
+ TA104 Interchange 
+Acknowledgement Code 
+See table below for values. 
+Note: The Exchange will only support TA104 
+Interchange Acknowledgement Codes “A” and “R” 
+ TA105 Interchange note code 
+See table below for values. 
+Note: The Exchange will not support TA105 
+Interchange note codes 028-031 
+Trailer IEA Interchange Control Trailer  
+ 
+Table 3. TA104 and TA105 supported codes 
+Element Code Description 
+TA104 A Interchange accepted with no errors. 
+TA104 R Interchange rejected because of errors. Sender must resubmit file. 
+TA105 000 No error 
+TA105 001 The Interchange Control Number in the header and trailer do not match. Use the 
+value from the header in the acknowledgment. 
+TA105 002 This Standard as noted in the Control Standards Identifier is not supported. 
+TA105 003 This Version of the controls is not supported 
+TA105 004 The Segment Terminator is invalid 
+TA105 005 Invalid Interchange ID Qualifier for sender 
+
+--- PAGE 10 ---
+© GetInsured 2023 All Rights Reserved.         10 
+Element Code Description 
+TA105 006 Invalid Interchange Sender ID 
+TA105 007 Invalid Interchange ID Qualifier for receiver 
+TA105 008 Invalid Interchange Receiver ID 
+TA105 009 Unknown Interchange Receiver ID 
+TA105 010 Invalid Authorization Information Qualifier value 
+TA105 011 Invalid Authorization Information value 
+TA105 012 Invalid Security Information Qualifier value 
+TA105 013 Invalid Security Information value 
+TA105 014 Invalid Interchange Date value 
+TA105 015 Invalid Interchange Time value 
+TA105 016 Invalid Interchange Standards Identifier value 
+TA105 017 Invalid Interchange Version ID value 
+TA105 018 Invalid Interchange Control Number 
+TA105 019 Invalid Acknowledgment Requested value 
+TA105 020 Invalid Test Indicator value 
+TA105 021 Invalid Number of Included Group value 
+TA105 022 Invalid control structure 
+TA105 023 Improper (Premature) end-of-file (Transmission) 
+TA105 024 Invalid Interchange Content (e.g., invalid GS Segment) 
+TA105 025 Duplicate Interchange Control Number 
+TA105 026 Invalid Data Element Separator 
+TA105 027 Invalid Component Element Separator 
+ 
+
+--- PAGE 11 ---
+© GetInsured 2023 All Rights Reserved.         11 
+5.2. 999 Functional Acknowledgments 
+The 999 Functional / Implementation Acknowledgment has been specified by HIPAA 5010 as the standard 
+acknowledgment document for healthcare. It confirms a file was received and is used to provide additional 
+validation reporting. The EDI 999 is used to report both syntactical errors and implementation guide 
+conformance.  
+ 
+The EDI 999 provides specifics on any syntax-related issues that caused errors and on whether the 
+transaction is in compliance with HIPAA requirements. EDI 999 allows a trading partner to report 
+implementation guide edits and edits against the base X12 standard, allowing the submitter to correct and 
+resubmit problematic transactions. 
+● The Exchange expects to receive a 999 functional acknowledgment for every functional group in 
+every file sent. 
+● The Exchange will send 999 functional acknowledgements for every functional group in every 
+inbound 834 file received. 
+● If a TA1 is rejected, a 999 will not be sent. 
+ 
+Example of what a 999 report looks like (shown unwrapped):  
+ISA*00*          *00*          *ZZ*AK0            *ZZ*990299999      *210423*1403*^*00501*000000018*0*T*:~ 
+GS*FA*AK0*990299999*20210423*140342*18*X*005010X231A1~ 
+ST*999*0001*005010X231A1~ 
+AK1*BE*13*005010X220A1~ 
+AK2*834*9d35f6487*005010X220A1~ 
+IK3*ST*1**8~ 
+IK4*2*329*7*9d35f6487~ 
+IK5*R*5~ 
+AK9*R*1*1*0~ 
+SE*8*0001~ 
+GE*1*18~ 
+IEA*1*000000018~ 
+Table 4. 999 Functional Acknowledgment Segments 
+Table or 
+Loop 
+Element Element Name Value 
+Header ISA Interchange Control Header  
+Header GS Functional Group Header  
+Header ST Transaction Set Header  
+
+--- PAGE 12 ---
+© GetInsured 2023 All Rights Reserved.         12 
+Table or 
+Loop 
+Element Element Name Value 
+Header AK1 Functional Group Response This segment refers to the (GS) group level of the 
+original document.  
+ AK101 Functional Identifier Code Value from the functional group to which this 999 
+is responding. 
+ AK102 Group Control Number Value from the functional group to which this 999 
+is responding. 
+ AK103 Version Release/Industry 
+Identifier Code 
+Value from the functional group to which this 999 
+is responding. 
+2000 AK2 Transaction Set Response 
+Header 
+This segment refers to the (ST) Transaction Set 
+level of the document. 
+ AK201 Transaction Set Identifier 
+Code 
+Value from the transaction set to which this 999 is 
+responding. 
+ AK202 Transaction Set Control 
+Number 
+Value from the transaction set to which this 999 is 
+responding. 
+ AK203 Implementation Convention 
+Reference 
+Value from the transaction set to which this 999 is 
+responding. 
+2100 IK3 Error Identification Used to report errors in a data segment and 
+identify the location of the data segment. 
+ IK301 Segment ID Code Code defining the segment ID of the data segment 
+in error. 
+ IK302 Segment Position in 
+Transaction Set 
+The numerical count position of this error data 
+from the start of Transaction set. 
+ IK303 Loop Identifier Code The error loop ID number. 
+ IK304 Implementation Segment 
+Syntax Error Code 
+Code indicating implementation error found based 
+on the syntax editing of a segment. 
+1 – Unrecognized segment ID  
+2 – Unexpected segment  
+3 – Required Segment Missing  
+4 – Loop Occurs Over Maximum Times  
+5 – Segment Exceeds Maximum Use  
+6 – Segment Not in Defined Transaction Set  
+7 – Segment Not in Proper Sequence  
+8 – Segment Has Data Element Errors  
+
+--- PAGE 13 ---
+© GetInsured 2023 All Rights Reserved.         13 
+Table or 
+Loop 
+Element Element Name Value 
+I4 – Implementation “Not Used” Segment Present  
+I6 – Implementation Dependent Segment Missing  
+I7 – Implementation Loop Occurs Under Minimum Times  
+I8 – Implementation Segment Below Minimum Use  
+I9 – Implementation Dependent “Not Used” Segment Present 
+2100 CTX Segment Context This segment is used to identify the data that 
+triggered the situational requirement. 
+ CTX01-1 Context Name 
+Holds information to identify the business unit 
+that was in error and followed by the context 
+Reference. 
+ CTX01-2 Context Reference Context reference value for the error 
+2110 IK4 Implementation Data 
+Element Note 
+Used to report errors in a data element and 
+identify the location of the data element. 
+ IK401 Element Position in Segment Position of error element within a segment. 
+ IK402 Data Element Reference 
+Number Reference number of data element in error. 
+ IK403 Implementation Data 
+Element Syntax Error Code 
+Code indicating the implementation error found 
+after syntax edits of a data element. 
+1 – Required Data Element Missing  
+2 – Conditional Required Data Element Missing  
+3 – Too Many Data Elements  
+4 – Data Element Too Short  
+5 – Data Element Too Long  
+6 – Invalid Character In Data Element  
+7 – Invalid Code Value  
+8 – Invalid Date  
+9 – Invalid Time  
+10 – Exclusion Condition Violated  
+12 – Too Many Repetitions  
+13 – Too Many Components  
+I10 – Implementation “Not Used” Data Element Present  
+I11 – Implementation Too Few Repetitions  
+I12 – Implementation Pattern Match Failure  
+I13 – Implementation Dependent “Not Used” Data Element 
+Present  
+I6 – Code Value Not Used in Implementation  
+I9 – Implementation Dependent Data Element Missing 
+ IK404 Copy of Bad Data Element 
+This element will contain a copy of the data 
+element in error; from 1 to 99 alpha numeric 
+characters will be displayed 
+
+--- PAGE 14 ---
+© GetInsured 2023 All Rights Reserved.         14 
+Table or 
+Loop 
+Element Element Name Value 
+Trailer IK5 Transaction Set Response 
+Trailer Uses to report errors in a transaction set. 
+ IK501 Transaction Set Status 
+Code indicating accept or reject condition based 
+on the syntax editing of the transaction set. 
+A – Accepted  
+R – Rejected 
+ IK502 Implementation Transaction 
+Set Syntax Error Code 
+Code indicating implementation error found based 
+on the syntax editing of a transaction set. 
+1 – Transaction Set Not Supported  
+2 – Transaction Set Trailer Missing  
+3 – Transaction Set Control Number in Header and Trailer Do 
+Not Match  
+4 – Number of Included Segments Does Not Match Actual 
+Count  
+5 – One or More Segments in Error  
+6 – Missing or Invalid Transaction Set Identifier  
+7 – Missing or Invalid Transaction Set Control Number  
+8 – Authentication Key Name Unknown  
+9 – Encryption Key Name Unknown  
+10 – Requested Service (Authentication or Encrypted) Not 
+Available  
+11 – Unknown Security Recipient  
+12 – Incorrect Message Length (Encryption Only)  
+13 – Message Authentication Code Failed  
+15 – Unknown Security Originator  
+16 – Syntax Error in Decrypted Text 
+17 – Security Not Supported  
+18 – Transaction Set not in Functional Group  
+19 – Invalid Transaction Set Implementation Convention 
+Reference  
+23 – Transaction Set Control Number Not Unique within the 
+Functional Group  
+24 – S3E Security End Segment Missing for S3S Security Start 
+Segment  
+25 – S3S Security Start Segment Missing for S3E Security End 
+Segment  
+26 – S4E Security End Segment Missing for S4S Security Start 
+Segment  
+27 – S4S Security Start Segment Missing for S4E Security End 
+Segment  
+I5 – Implementation One or More Segments in Error  
+I6 – Implementation Convention Not Supported 
+Trailer AK9 Functional Group Response 
+Trailer 
+Summary of the disposition of the received 
+functional group and report the number of 
+included transactional sets from the original 
+document. 
+
+--- PAGE 15 ---
+© GetInsured 2023 All Rights Reserved.         15 
+Table or 
+Loop 
+Element Element Name Value 
+ AK901 Functional Group 
+Acknowledge Code 
+Code indicating accept or reject condition based 
+on the syntax editing of the functional group. 
+A – Accepted  
+E – Accepted, But Errors Were Noted  
+P – Partially Accepted, At Least One Transaction Set Was 
+Rejected  
+R – Rejected 
+ AK902 Number of Transaction Sets 
+Included 
+Total number of transaction sets included in the 
+functional group or interchange group terminated 
+by the trailer containing this data element.  
+ AK903 Number of Received 
+Transaction Sets Total number of transaction sets received 
+ AK904 Number of Accepted 
+Transaction Sets Total number of transaction sets accepted 
+Trailer SE Transaction Set Trailer  
+Trailer GE Functional Group Trailer  
+Trailer IEA Interchange Control Trailer  
+ 
+6. Subscribers / Non-Subscriber Enrollees 
+Subscribers and non-subscriber members are sent as separate occurrences of Loop 2000 within the same 
+file. The initial enrollment for the Subscriber must be sent before sending the initial enrollment for any of 
+the Subscriber’s dependents. 
+7. Uppercase Letters, Special Characters, and Delimiters 
+As specified in the TR3, the basic character set includes uppercase letters, digits, space, and other special 
+characters with the exception of those used for delimiters. 
+● All HIPAA segments and qualifiers must be submitted in UPPERCASE letters only. 
+● Delimiters for the transactions are as follows: 
+
+--- PAGE 16 ---
+© GetInsured 2023 All Rights Reserved.         16 
+Table 5. EDI Delimiters 
+Character Name Delimiter 
+* Asterisk Data Element Separator 
+^ Carat Repetition Separator 
+: Colon Component Element Separator 
+~ Tilde Segment Terminator 
+● As per standard EDI practice, only one segment terminator is allowed at the end of each segment. 
+Line Feed/Carriage Return cannot be used in combination with the Tilde segment terminator. 
+● To avoid syntax errors, hyphens, parentheses, and spaces are not recommended to be used in 
+values for identifiers. 
+Examples: Tax ID 123654321, SSN 123456789, Phone 8001235010 
+8. Individual Transactions 
+Separate files will be created for Individual enrollments to aid insurance Issuers in processing enrollment 
+transactions. 
+Multiple Groups / Sponsors will be represented in a single 834 but 834s will not be grouped by sponsor. 
+9. Control Segments / Envelopes 
+Trading partners should follow the Interchange Control Structure (ICS) and Functional Group Structure (GS) 
+guidelines for HIPAA that are located in the HIPAA implementation guides. The following sections address 
+specific information needed by the Exchange in order to process the ASC X12N/005010X220A1-834 Benefit 
+Enrollment and Maintenance Transaction. This information should be used in conjunction with the ASC 
+X12N/005010X220 – Benefit Enrollment and Maintenance TR3. 
+Table 6. EDI Control Segments 
+Element Element Name Value Validation2 
+ISA01  Authorization Information 
+Qualifier “00” TA1 – must be “00” 
+ISA03 Security Information Qualifier “00” TA1 – must be “00” 
+ISA05 Interchange Sender ID Qualifier “ZZ” TA1 – must be “ZZ” 
+
+--- PAGE 17 ---
+© GetInsured 2023 All Rights Reserved.         17 
+Element Element Name Value Validation2 
+ISA06 Interchange Sender ID 
+AK0 for the Exchange outbound to 
+Issuer’s Federal Tax ID for Issuer 
+inbound to the Exchange (differs 
+from CMS) 1 
+ 
+ISA07 Interchange Receiver ID Qualifier “ZZ” TA1 – must be “ZZ” 
+ISA08 Interchange Receiver Qualifier 
+“<RECEIVERS FEDERAL TAX ID>” for 
+the Exchange outbound to Issuer 
+AK0 for Issuer inbound to the 
+Exchange (differs from CMS) 1 
+ 
+ISA13 Interchange Control Number 
+Unique control number, GI stores and 
+tracks by Issuer and will reject a 
+transmission when ISA13 is 
+duplicated. Applies to inbound to 
+Exchange 834 transactions only. TA1 
+and 999 transactions are not 
+validated for duplicate ISA13. 
+ 
+ISA14 Interchange Acknowledgment 
+Requested 
+“1” for 834 transaction 
+“0” for TA1/999 transaction 
+TA1 – must be “1” 
+for inbound 834 
+ISA15 Usage Indicator “T” for test 
+“P” for production 
+TA1 – must match 
+environment 
+GS01 Functional Identifier Code “BE”  
+GS02 Application Sender’s Code 
+AK0 for the Exchange outbound to 
+Issuer 
+Issuer’s Federal Tax ID for Issuer 
+inbound to the Exchange1 
+ 
+GS03 Application Receiver’s Code 
+“<RECEIVER’S FEDERAL TAX ID>” for 
+the Exchange outbound to Issuer 
+AK0 for Issuer inbound to the 
+Exchange1 
+ 
+GS06 Group Control Number 
+The GS06 control number of all 
+outbound 834 data will be set to the 
+same value as the ISA13 control 
+ 
+
+--- PAGE 18 ---
+© GetInsured 2023 All Rights Reserved.         18 
+Element Element Name Value Validation2 
+number to allow the 999 to reference 
+the appropriate 834 transaction. 
+For inbound 834, the GS06 must be 
+unique within all transmissions. 
+GetInsured stores and tracks GS06 
+values by Issuer and will reject a 
+transmission when a GS06 value has 
+been duplicated for a particular 
+Issuer. The GS06 value is passed back 
+in the outbound 999 in the AK102 
+position and is the primary reference 
+to the inbound 834.  
+GS08 Version / Release / Industry 
+Identifier Code “005010X220A1”  
+ST01 Transaction Set Identifier Code “834”  
+ST02 Transaction Set Control Number 
+Identifying control number that must 
+be unique within the transaction set 
+functional group assigned by the 
+originator for a transaction set. The 
+number must be identical to the SE02 
+data element. 
+ 
+Note:  The Exchange uses the 
+common EDI practice of only 
+accepting numeric values. (differs 
+from CMS)   
+The simplest use of the ST02 and 
+SE02 values is a sequential counter 
+that increments by 1 for each new ST 
+envelope. Typically, starting value is 
+000000001. 
+Must be numeric 
+ST03 Implementation Convention 
+Reference  
+“005010X220A1”   Same value as 
+GS08 
+ 
+
+--- PAGE 19 ---
+© GetInsured 2023 All Rights Reserved.         19 
+1 Note: In the table above for ISA06, ISA08, GS02, and GS03: where “AK” is used as part of a value, it is 
+replaced by a given Exchange’s state abbreviation. For example, in AK, the value for Element ISA06 will be 
+“AK0” or in AZ, the value for Element ISA06 will be “AZ0”.  
+2 Note: where is indicated in the validation column, that data element is validated for possible TA1/999 
+rejection or 2nd level business validation rejection for inbound to Exchange transactions. 
+  
+
+--- PAGE 20 ---
+© GetInsured 2023 All Rights Reserved.         20 
+10. The Exchange Business Rules and Limitations 
+Refer to the CMS Standard Companion Guide Transaction v5.0 for information on business rules and 
+limitations. The Exchange will be adhering to these rules, with the following exceptions to the General 
+Business Rules. 
+10.1. General Business Rules Exceptions 
+The Exchange will send separate transactions if multiple products (Medical & Dental) are selected from the 
+same Issuer. The Exchange will not send these as multiple Member Detail Loops at the 2000 Member Level. 
+The Exchange will leverage the 2750 loop to define custom loops (an option the X12 allows trading 
+partners). These custom fields provide Issuers additional information useful in the reconciliation context. If 
+an Issuer is not able to ingest the information contained in the custom loop, although highly recommended, 
+the Issuer can ignore the loops. For additional information, refer to Section 11.1.2 below. 
+10.2. Individual Market Rate Calculations Exceptions 
+● The Exchange will not have Family Rated Definitions / Calculations for Individual markets as it is per 
+Member per Month 
+● Other Payment Amounts (OTH PAY AMT 1) will not be used unless the Exchange is enabled for State 
+Subsidy. See Section 11.1 2750 loop for more details. 
+Refer to Section 9.5 of CMS Standard Companion Guide Transaction v5.0 for additional details. 
+ 
+  
+
+--- PAGE 21 ---
+© GetInsured 2023 All Rights Reserved.         21 
+11. The Exchange To Issuer Business Scenarios For 834 
+11.1. Initial Enrollment Supplemental Instructions 
+An Initial Enrollment transmission is created by the Exchange and sent to the QHP Issuer after an application 
+has been determined eligible and a QHP has been selected. A sample 834 is provided in Appendix 17.1. 
+Table 7. Initial Enrollment Supplemental Instructions 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+Header BGN Beginning Segment   
+ BGN05   Not sent 
+ BGN08 Action Code 2 Change (Update) 
+Header QTY Transaction Set 
+Control Totals 
+ Will transmit all three iterations of this segment 
+ QTY01 Quantity Qualifier 
+TO 
+Total. Will transmit to indicate that the value 
+conveyed in QTY02 represents the total number of 
+INS segments in this ST/SE set. 
+DT 
+Dependent Total. Will transmit to indicate that 
+the value conveyed in QTY02 represents the total 
+number of INS segments in this ST/SE set with 
+INS01 = “N”. 
+ET 
+Employee Total (Subscribers). Will transmit to 
+indicate that the value conveyed in QTY02 
+represents the total number of INS segments in 
+this ST/SE set with INS01 = “Y”. 
+1000A N1 Sponsor Name 
+ The sponsor name is the primary household 
+contact (PHC) regardless if PHC is not applying for 
+coverage. 
+ N101 Entity Identifier 
+Code 
+P5 Plan Sponsor 
+ N102 Sponsor Name  Mapped to Sponsor Name 
+ N103 FI Sponsor Federal Tax ID (i.e. SSN) 
+
+--- PAGE 22 ---
+© GetInsured 2023 All Rights Reserved.         22 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+Identification Code 
+Qualifier 
+24 Employer’s Identification Number 
+94 Exchange Assigned Subscriber ID 
+ N104 Identification Code  Default is Sponsor Tax ID (FI). When the Sponsor 
+Tax ID is not available, the Exchange Assigned 
+Subscriber ID (94) will be sent. When neither the 
+Sponsor Tax ID nor the Exchange Assigned 
+Subscriber ID are available, the Sponsor Employers 
+Identification Number (24) will be sent. 
+1000B N1 Payer  Identifies the Issuer of the QHP 
+ N101 Entity Identifier 
+Code 
+IN Insurer 
+ N103 Identification Code 
+Qualifier 
+FI Will transmit the Issuer Federal Tax ID 
+XV Will transmit the CMS HPID 
+1000C N1 TPA / Broker Name  
+Will transmit if a broker was involved in the 
+enrollment 
+ N101 Entity Identifier 
+Code BO Broker or Sales Office 
+ N102 Broker Name  Mapped to Broker/Agent Name 
+ N103 Identification Code 
+Qualifier 
+FI Will transmit the Broker Federal Tax ID 
+XV Will transmit the CMS HPID 
+ N104 TPA / Broker 
+Identification Code 
+ 
+Will transmit the broker’s federal tax id when a 
+broker was involved in the enrollment (differs 
+from CMS) 
+1100C ACT TPA / Broker 
+Account Information 
+ 
+Will transmit if a broker was involved in the 
+enrollment (differs from CMS) 
+ ACT01 TPA / Broker 
+Account Information 
+ 
+Will transmit the broker’s National Producer 
+Number (NPN) or State License Number, 
+depending on state, if a broker was involved in the 
+enrollment. 
+
+--- PAGE 23 ---
+© GetInsured 2023 All Rights Reserved.         23 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS02 Individual 
+Relationship Code 
+ See Section 15 for list of codes 
+ INS03 Maintenance Type 
+Code  
+The following are the possible value based on the 
+enrollment event scenario. 
+● 001 Change – Used to indicate a 
+change to an existing 
+Subscriber/dependent record. 
+● 021 Addition – Used to add a 
+Subscriber or dependent. 
+● 024 Cancellation or Termination – 
+Used for cancellation, termination, or 
+deletion of a Subscriber or dependent. 
+● 025 Reinstatement – Used to reinstate 
+an enrollment. 
+ INS04 Maintenance 
+Reason Code  Refer to Section 16 of this document for list of 
+codes supported by the Exchange 
+ INS06 Medicare Status 
+Code 
+ Not sent 
+ INS08 Employment Status 
+Code AC Active 
+2000 REF Subscriber Identifier   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number 
+ REF02 Subscriber Identifier  
+The Exchange Assigned ID of the subscriber 
+(member id of subscriber). 
+Individual Market: If enrollment is for dependents 
+only, the youngest member will be the subscriber. 
+Pediatric Dental: If enrollment is for dependents 
+only, the youngest member will be the subscriber. 
+
+--- PAGE 24 ---
+© GetInsured 2023 All Rights Reserved.         24 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member ID is sent in REF02 
+1L Exchange Assigned Policy ID is sent in REF02 
+6O 
+Payment Transaction ID is sent in REF02. 
+Payment transaction ID is a unique ID created just 
+once at initial enrollment creation. Every 
+enrollment created in the system has this ID 
+generated during enrollment creation. This unique 
+ID is forwarded to the pay now functionality at the 
+click of the pay now button and included in the 
+payment redirection SAML. 
+4A 
+Exchange Assigned Enrollee ID. A unique value for 
+each member by plan per coverage year. 
+Configurable at the Exchange level to send for all 
+transactions or not send.  
+Additional details on Re-enrollment Gap in 
+Coverage in Section 11.8.1. 
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+2000 DTP File Effective Date  
+Will transmit to indicate the date the information 
+was gathered if that date is not the same as 
+ISA09/GS04 date 
+ DTP01 Date Time Qualifier 
+303 
+Maintenance Effective 
+(differs from CMS) Note: Sent for all transactions. 
+Event date the system add/change/term. 
+356 
+Eligibility Begin Date 
+(differs from CMS) Note: Will not be transmitted 
+by the Exchange 
+2100A NM1 Member Name   
+
+--- PAGE 25 ---
+© GetInsured 2023 All Rights Reserved.         25 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ NM101 Member Entity ID 
+Code IL Insured or Subscriber 
+ NM109 Member Identifier  
+The SSN is allowed for this Federally administered 
+program based on confidentiality regulations. Will 
+transmit the member’s SSN when known. 
+2100A PER 
+Member 
+Communications 
+Numbers 
+ 
+Will transmit three communication contacts --- 
+home phone, cell phone, or email address --- 
+when the information is available. 
+Only sent for the subscriber if the subscriber is the 
+household contact. Not sent for dependents. 
+Communication contacts will be sent in the 
+following order: 
+1st --- Primary Phone (“TE”)  
+2nd --- Secondary Phone (“AP”) 
+3rd --- Preferred Communication Method (“EM” 
+for email or “BN” for a phone number for 
+receiving text messages.) If no preferred 
+communication method is chosen, the 3rd 
+communication contact will not be sent. 
+Note: Primary Phone (TE) contains the cell phone 
+and Secondary Phone (AP) contains the home 
+phone if primary household contact has provided 
+both. If only cell or home phone is provided, 
+Primary Phone (TE) is populated with that value. 
+Note: Email (EM) will be transmitted only if the 
+consumer has elected email as their Preferred 
+Communication Method. (differs from CMS) 
+2100A N3 Member Address  
+Member Home address will always be sent for 
+each member. Applies to all transactions. 
+2100A N4 Member City, State, 
+ZIP Code 
+ 
+Member Home address will always be sent for 
+each member. Applies to all transactions. 
+ N406 Location Identifier  
+Will transmit FIPS HUB 6-4 County of Residence 
+when available 
+
+--- PAGE 26 ---
+© GetInsured 2023 All Rights Reserved.         26 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2100A DMG Member 
+Demographics 
+  
+ DMG02 Member Birth Date  
+Member date of birth expressed in format 
+CCYYMMDD will be passed here 
+ DMG03 Gender Code  Member gender 
+ DMG04 Marital Status Code  
+Will be transmitted for subscriber only. Will 
+support full complement of marital status codes 
+from FFM. Defaults to R – unreported when not 
+provided. (differs from CMS) 
+ DMG05- 03 Race or Ethnicity 
+Code 
+ Will transmit when available 
+ DMG06 Citizenship Status 
+Code 
+ Will transmit when available 
+2100A EC Employment Class  
+This segment will never be transmitted for the 
+Exchange 
+2100A ICM Member Income  
+This segment will never be transmitted for the 
+Exchange 
+2100A AMT Member Policy 
+Amounts 
+ 
+This segment will never be transmitted for the 
+Exchange 
+2100A HLH Member Health 
+Information 
+  
+ HLH01 Health Related Code 
+T Tobacco Use  
+N No Tobacco Use 
+U Unknown Tobacco Use 
+2100A LUI Member Language  
+Transmission of this information is required when 
+known and allowed. Spoken and Written language 
+information will be transmitted when known. 
+Will only be sent for subscriber when the 
+subscriber is the household contact. 
+
+--- PAGE 27 ---
+© GetInsured 2023 All Rights Reserved.         27 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2100A LUI01 Identification Code 
+Qualifier LD 
+NISO Z39.53 Language Codes 
+NISO values supported by Exchange (in general 
+English or Spanish, unless expanded list requested 
+by state Exchange). The Exchange owns the 
+responsibility to manage which language codes 
+are supported. 
+ LUI02 Language Code  Refer to Section 17 for the spoken and written 
+language codes supported.  
+ LUI04 Language Use 
+Indicator 
+6 Written Language 
+7 Spoken Language 
+2100B NM1 Incorrect Member 
+Name Loop 
+ 
+Prior Incorrect Insured - This loop where NM101 
+“70”, does not apply to initial enrollments. See 
+Section 11.18  
+2100C NM1 Member Mailing 
+Address 
+  
+2100C NM101 Entity Identifier 
+Code 31 
+Member Mailing Address - This loop where 
+NM101 “31”, will always be transmitted for each 
+member. 
+2100C N3 Member Mailing 
+Address 
+ 
+Member Mailing Address will always be sent for 
+each member. Applies to all transactions. 
+2100C N4 Member Mailing 
+City, State, ZIP Code 
+ 
+Member Mailing Address will always be sent for 
+each member. Applies to all transactions. 
+2100D NM1 Member Employer 
+Loop 
+ 
+Employer - This loop where NM101 “36”, will 
+never be transmitted for the Exchange 
+2100E NM1 Member School 
+Loop 
+ 
+Educational Institution - This loop where NM101 
+“M8”, will never be transmitted for the Exchange 
+2100F NM1 Custodial Parent 
+Loop 
+ 
+Custodial Parent - This loop where NM101 “S3” 
+will never be transmitted for the Exchange (differs 
+from CMS) 
+
+--- PAGE 28 ---
+© GetInsured 2023 All Rights Reserved.         28 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2100G  
+Responsible Person 
+Loop 
+ 
+Responsible Person loop will be sent for all 
+members on the enrollment regardless of age 
+when the subscriber is under the age of 18 at the 
+time of enrollment or when the subscriber is a 
+Ward.  
+Configurable whether to limit sending Responsible 
+Person loop as noted above, or always send the 
+Responsible Person loop for all members for all 
+transactions.  
+Additional details on Child Only Enrollment in 
+Section 11.1.4. 
+2100G NM1 Responsible Person  
+For financial applications, the Responsible Person 
+is the Primary Tax Filer. For non-financial 
+applications, the Responsible Person is the 
+Primary Household Contact. 
+ NM101 Entity Identifier 
+Code QD Responsible Party - Will transmit “QD” when sent. 
+Parent “S1” will never be sent. (differs from CMS) 
+ NM109 Responsible Party 
+Identifier 
+ 
+The SSN is allowed for this Federally administered 
+program based on confidentiality regulations. Will 
+transmit the SSN when known. 
+2100G PER 
+Responsible Person 
+Communication 
+Numbers 
+ 
+Will transmit three communication contacts --- 
+home phone, cell phone, or email address --- 
+when the information is available. 
+Communication contacts will be sent in the 
+following order: 
+1st --- Primary Phone (“TE”) 
+2nd --- Secondary Phone (“AP”) 
+3rd --- Preferred Communication Method (“EM” 
+for email or “BN” for a phone number for 
+receiving text messages.) If no preferred 
+communication method is chosen, the 3rd 
+communication contact will not be sent. 
+Note: Primary Phone (TE) contains the cell phone 
+and Secondary Phone (AP) contains the home 
+phone if primary household contact has provided 
+
+--- PAGE 29 ---
+© GetInsured 2023 All Rights Reserved.         29 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+both. If only cell or home phone is provided, 
+Primary Phone (TE) is populated with that value. 
+Note: Email (EM) will be transmitted only if the 
+consumer has elected email as their Preferred 
+Communication Method. (differs from CMS) 
+2100G N3 Responsible Person 
+Address 
+ 
+Responsible Person Address will be sent when 
+applicable. 
+2100G N4 Responsible Person 
+City, State, ZIP Code 
+ 
+Responsible Person Address will be sent when 
+applicable. 
+2100H NM1 Drop-Off Location 
+Loop 
+ 
+This loop where NM101 “45”, will never be 
+transmitted for the Exchange 
+2200 DSB Disability 
+Information Loop 
+ 
+This loop will never be transmitted for the 
+Exchange 
+2300 HD Health Coverage  
+Will transmit coverage information for the 
+qualifiers shown, as applicable 
+ HD01 Maintenance Type 
+Code 
+ 
+The following are the possible values based on the 
+enrollment event scenario. 
+● 001 Change – Used to indicate a 
+change to an existing 
+Subscriber/dependent record. 
+● 021 Addition – Used to add a 
+Subscriber or dependent. 
+● 024 Cancellation or Termination – 
+Used for cancellation, termination, or 
+deletion of a Subscriber or dependent. 
+● 025 Reinstatement – Used to reinstate 
+an enrollment. 
+ HD03 Insurance Line Code 
+HLT  Health Plan 
+DEN Dental Plan 
+ HD05 Coverage Level 
+Code 
+ Not sent 
+
+--- PAGE 30 ---
+© GetInsured 2023 All Rights Reserved.         30 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2300 DTP Health Coverage 
+Dates 
+  
+ DTP01 Date Time Qualifier 
+303 Maintenance Effective Date will not be 
+transmitted by the Exchange (differs from CMS) 
+348 The Enrollment Begin Date will be transmitted 
+(differs from CMS) Note: Sent for all transactions 
+349 
+The Enrollment Period End Date will be 
+transmitted 
+(differs from CMS) Note: Configurable at the 
+Exchange/Issuer level to send for all transactions 
+or restrict to cancel/term only.  
+DTP*349 will be present on any change 
+transaction (001) that is generated after a future 
+dated termination is processed. 
+543 
+ 
+ 
+Last Premium Paid Date 
+If the DTP*543 is sent on the inbound 834 
+confirmation for an enrollment, that date is 
+stored. Stored value is included for subsequent 
+834 transactions as follows: 
+• When sent, the DTP*543 is included only for 
+subscriber and is not sent on non-subscriber 
+transactions (021, 001, 024) 
+• DTP*543 is not sent on initial (021*EC) 
+transactions 
+• DTP*543 is sent on subscriber change (001) 
+transactions if inbound 834 confirmation 
+transaction was received and contained the 
+DTP*543 
+• DTP*543 is present on subscriber cancel/term 
+(024) transactions: 
+• on CANCEL transaction, sent only if 
+inbound 834 confirmation transaction was 
+received and contained the DTP*543, but 
+canceled before coverage begins 
+• on TERM transaction, sent only if 
+
+--- PAGE 31 ---
+© GetInsured 2023 All Rights Reserved.         31 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+inbound 834 confirmation transaction was 
+received and contained the DTP*543 
+2300 REF Health Coverage 
+Policy Number 
+  
+ REF01 Reference Identifier 
+Qualifier 
+CE 
+QHP ID Purchased is the Assigned Plan Identifier 
+(standard component identifier) plus the Variation 
+Component (HIOS ID) 
+1L Exchange Assigned Policy ID. This is the Exchange 
+internal enrollment id. 
+X9 
+QHP Issuer Assigned Health Coverage Purchased 
+Policy ID Number 
+Not sent on initial (021) transactions.  
+Sent on maintenance (001), cancel/term (024) 
+transactions, and reinstatement (025) 
+transactions, if provided on inbound confirmation 
+transaction 
+ZZ 
+Will transmit with the Client ID (HouseHold Case 
+ID). In the case of custom grouping (multiple 
+health enrollments for the same household), the 
+Client ID is the same for each enrollment. 
+ REF02 Reference 
+Identification  ID value for each REF01 qualifier transmitted 
+2300 REF Prior Coverage 
+Months QQ Unit Number – This segment will never be 
+transmitted for the Exchange 
+2300 IDC Identification Card  
+This segment will never be transmitted for the 
+Exchange 
+2310 LX Prior Information 
+Loop 
+ 
+This loop will never be transmitted for the 
+Exchange 
+2320 COB Coordination of 
+Benefits Loop 
+ 
+This loop will never be transmitted for the 
+Exchange 
+
+--- PAGE 32 ---
+© GetInsured 2023 All Rights Reserved.         32 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2330 NM1 
+Coordination of 
+Benefits Related 
+Entity Loop 
+ 
+This loop will never be transmitted for the 
+Exchange 
+2000 LS Additional Reporting 
+Categories 
+2700 
+This loop header will be transmitted when 
+additional premium category reporting is 
+appropriate. 
+2700 LX Member Reporting 
+Categories Loop 
+ 
+This loop will be transmitted when additional 
+premium category reporting is appropriate.  
+See Section 9.6 of the CMS guide for explicit 
+instructions related to loop 2700. 
+2750 N1 Reporting Category 
+Loop 
+ 
+See Sections 9.6.1 and 9.6.2 of the CMS guide for 
+explicit instructions related to the 2750 loop 
+2750 N1 Reporting Category  
+Reporting Category for Request Submit 
+Timestamp 
+Note: This will be transmitted for all transaction 
+sets (Add, Change, Term, Cancel and 
+Reinstatement). The same date time stamp will be 
+sent for all members on the 834 transaction.  
+If member data is not grouped within the same 
+ST/SE transaction set, utilize this value to properly 
+order member transactions.  
+Note: Configurable by state to use the expanded 
+16 position or 14 position timestamp. 
+ N101 Entity Identifier 
+Code 75 Participant 
+ N102 Member Reporting 
+Category Name 
+ Value = “REQUEST SUBMIT TIMESTAMP” 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 
+Member Reporting 
+Category Reference 
+ID 
+ 
+Value = DateTimeStamp in 
+CCYYMMDDHHMMSSSS format 
+
+--- PAGE 33 ---
+© GetInsured 2023 All Rights Reserved.         33 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ DTP01 Date / Time 
+Qualifier 007 Effective 
+ DTP02 Date Time Period 
+Format Qualifier D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time Period  Request Submit Date in CCYYMMDD format. 
+2750 N1 Reporting Category  
+Reporting Category for APTC for the enrollment 
+group 
+Note: This entire segment will appear only for 
+Subscriber. 
+ N101  75 Participant 
+ N102   Value = “APTC AMT” 
+ REF01  9V Payment Category 
+ REF02   
+Value = Consumer Elected APTC Amount 
+Note: If consumer is not ATPC eligible, 0.00 is sent. 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   APTC Effective Date in CCYYMMDD format 
+2750 N1 Reporting Category  
+Reporting Category for State Subsidy for the 
+enrollment group 
+Note: This entire segment will appear only for 
+Subscriber when applicable. Note: Configurable by 
+state. If configuration is enabled, and if consumer 
+is not state subsidy eligible, 0.00 is sent. 
+ N101  75 Participant 
+ N102   Value = “OTH PAY AMT 1” (differs from CMS) 
+ REF01  9V Payment Category 
+ REF02   Value = State Subsidy Amount 
+ DTP01  007 Effective 
+
+--- PAGE 34 ---
+© GetInsured 2023 All Rights Reserved.         34 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   State Subsidy Effective Date in CCYYMMDD format 
+2750 N1 Reporting Category  
+Reporting Category for CSR for the enrollment 
+group 
+Note: This entire segment will appear only for 
+Subscriber when applicable. 
+ N101  75 Participant 
+ N102   Value = “CSR AMT” 
+ REF01  9V Payment Category 
+ REF02   Value = CSR Amount 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   CSR Effective Date in CCYYMMDD format. 
+2750 N1 Reporting 
+Category 
+ 
+Reporting Category for individual premium rate 
+Note: Segment appears for all members on the 
+enrollment. 
+ N101  75 Participant 
+ N102   Value = “PRE AMT 1” 
+ REF01  9X Account Category 
+ REF02   Value = Individual Premium Amount 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   Pre Amt 1 Date in CCYYMMDD format 
+2750 N1 Reporting Category  
+Reporting Category for RATING AREA 
+Note: This entire segment will appear only for 
+Subscriber. 
+
+--- PAGE 35 ---
+© GetInsured 2023 All Rights Reserved.         35 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ N101  75 Participant 
+ N102   Value = “RATING AREA” 
+ REF01  9X Account Category 
+ REF02   Value = rating area 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   
+Rating Area Effective Date in CCYYMMDD format. 
+Note: Sent on maintenance transactions (differs 
+from CMS) 
+2750 N1 Reporting Category  
+Reporting Category for Total Individual 
+Responsibility amount (net premium) for the 
+enrollment group 
+Note: This entire segment will appear only for 
+Subscriber. 
+ N101  75 Participant 
+ N102   Value = “TOT RES AMT” 
+ REF01  9X Account Category 
+ REF02   Value = Total Individual Responsibility Amount 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   TOT RES AMT Date in CCYYMMDD format. 
+2750 N1 Reporting Category  
+Reporting Category for Total Premium (gross) for 
+the enrollment group 
+Note: This entire segment will appear only for 
+Subscriber. 
+ N101  75 Participant 
+ N102   Value = “PRE AMT TOT” 
+
+--- PAGE 36 ---
+© GetInsured 2023 All Rights Reserved.         36 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ REF01  9X Account Category 
+ REF02   Value = Total Premium Amount 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   PRE AMT TOT Date in CCYYMMDD format. 
+2750 N1 Reporting Category  
+Reporting Category for Qualifying Life Event QLE 
+Identifier 
+Note: This segment will appear for all members 
+when applicable. 
+ N101  75 Participant 
+ N102   Value = “SEP” (differs from CMS) 
+ REF01  17 Client Reporting Category 
+ REF02   Value = QLE Identifier 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   QLE Date in CCYYMMDD format. 
+2750 N1 Reporting Category  
+Reporting Category for Special Enrollment Period 
+SEP reason 
+Note: This segment will appear for all members 
+when applicable. 
+Note: This segment, while typically associated 
+with Term and Change transactions, may be 
+populated with Adds and Reinstatements.  
+ N101  75 Participant 
+ N102   Value = “SEP REASON”  
+ REF01  17 Client Reporting Category 
+ REF02   Value = SEP Reason code 
+
+--- PAGE 37 ---
+© GetInsured 2023 All Rights Reserved.         37 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   SEP Date in CCYYMMDD format. 
+2750 N1 Reporting Category  
+Used for plan changes, auto-renewal, or 
+reinstatement, within the same Issuer, to 
+correlate member old policy with the new policy. 
+Note: This segment will appear for all members 
+when applicable. 
+ N101  75 Participant 
+ N102   Value = “OLD POLICY ID” 
+ REF01  17 Client Reporting Category 
+ REF02   
+Value = Prior Exchange-Assigned Policy ID 
+(REF*1L) 
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03    Date in CCYYMMDD format. 
+2750 N1 Reporting Category  
+The Exchange will send {state_abbreviation}0 for 
+the SOURCE EXCHANGE ID. Configurable by state 
+to include for cancel and term transactions. 
+ N101  75 Participant 
+ N102   Value = “SOURCE EXCHANGE ID” 
+ REF01  17 Client Reporting Category 
+ REF02   Value = State abbreviation code + 0 Example: AK0  
+ DTP01  007 Effective 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+
+--- PAGE 38 ---
+© GetInsured 2023 All Rights Reserved.         38 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ DTP03   
+Date in CCYYMMDD format 
+Note: Sent on all transactions (differs from CMS) 
+ 
+11.1.1. 2750 Loop Reporting Category Values 
+The following is a list of the possible 2750 standard and custom monthly 2750 loop values. 
+Table 8. Reporting Category 2750 Loop 
+2750 
+Loop 
+Type 
+Value in N102 Value in REF02 Date in DTP03 Exists for 
+Standard REQUEST SUBMIT 
+TIMESTAMP 
+Event Creation Date Time  Event date All members 
+ OLD POLICY ID Prior Exchange-Assigned Policy ID (REF*1L) Event date All members 
+ APTC AMT Consumer Elected APTC Amount See Section 11.1.3 Subscriber only 
+ CSR AMT CSR Amount See Section 11.1.3 Subscriber only 
+ OTH PAY AMT 1 State Subsidy Amount See Section 11.1.3 Subscriber only 
+ PRE AMT 1 Individual Premium Amount See Section 11.1.3 All members 
+ RATING AREA Rating Area Enrollee coverage 
+start date 
+Subscriber only 
+ TOT RES AMT Total Individual Responsibility Amount (net 
+premium) 
+See Section 11.1.3 Subscriber only 
+ PRE AMT TOT Total Premium Amount (gross)  See Section 11.1.3 Subscriber only 
+ RENP RENP (Auto-renewal indicator) N/A All members 
+ SEP QLE Identifier 
+See Section 11.16 
+Event date All members 
+ SEP REASON SEP Reason Code 
+See Section 11.17 
+Event date All members 
+ ADDL MAINT REASON Additional Maintenance Reason: 
+AUTORENEW  
+(Auto-renewal indicator) 
+Enrollee coverage 
+start date 
+All members 
+ ADDL MAINT REASON Additional Maintenance Reason: 
+AGENT BROKER INFO 
+N/A All members 
+ ADDL MAINT REASON Additional Maintenance Reason: 
+CANCEL 
+TERM 
+Enrollee coverage 
+start date 
+Applicable 
+member only 
+ 
+ SOURCE EXCHANGE ID State abbreviation code + 0 Enrollee coverage 
+start date 
+All members 
+Custom 
+Monthly  
+MONTHLY PRE AMT TOT Monthly Total Premium Amount (gross) 
+May be retroactive and pro-rated in the 
+event of mid-month birth/death. 
+First of month All members 
+ MONTHLY ATPC AMT Monthly Consumer Elected ATPC Amount First of month All members 
+ MONTHLY STATE 
+SUBSIDY AMT 
+Monthly State Subsidy Amount First of month All members 
+ MONTHLY TOT RES AMT Monthly Total Individual Responsibility 
+Amount (net premium) 
+May be retroactive and pro-rated in the 
+event of mid-month birth/death. 
+First of month All members 
+
+--- PAGE 39 ---
+© GetInsured 2023 All Rights Reserved.         39 
+11.1.2. Custom Monthly 2750 Loops 
+The Exchange sends monthly premiums and APTC amounts in the member reporting category section in the 
+834 file. It is highly recommended that Issuers intake this data, as it is intended to help Issuers with 
+reconciliation efforts of financial amount changes during a coverage year. For any state Exchange configured 
+to use state subsidy, monthly state subsidy amounts will be sent in addition to monthly premiums and APTC 
+amounts.  
+● These monthly amounts will be transmitted on Add, Change, Term, Cancel and Reinstatement 
+transactions for all members. 
+○ A cancellation at the subscriber level will not contain the monthly premium, APTC, or state 
+subsidy amounts. 
+○ A termination at the subscriber level may contain the monthly premium, ATPC, and state 
+subsidy amounts for any utilized portion of the coverage period. 
+○ When cancelling a single member within the household the monthly premium, APTC, and 
+state subsidy amounts will not be sent for the cancelled member however the monthly 
+premium, APTC and state subsidy amounts will be sent for the remaining household 
+members. 
+● These monthly amounts will be populated with the currently known values for all future months 
+These monthly amounts are not required to be transmitted back to the Exchange during effectuation 
+Table 9. Monthly Premium Fields (will be transmitted for all members) 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+2750 N1 Reporting Category  
+Custom segment added to the Exchange to 
+transmit total monthly premiums (gross) 
+ N101 Entity Identifier 
+Code 75 Participant 
+ N102 Member Reporting 
+Category Name 
+ 
+The Exchange will send “MONTHLY PRE AMT TOT” 
+value, representing the Monthly Total Premium 
+Amount (gross) in the Exchange system 
+ REF Reporting Category 
+Reference 
+ 
+N1 segment for “MONTHLY PRE AMT TOT” will 
+always be accompanied by REF segment 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+9X Account Category 
+
+--- PAGE 40 ---
+© GetInsured 2023 All Rights Reserved.         40 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ REF02 
+Member Reporting 
+Category Reference 
+ID 
+ 
+The Exchange will send the dollar value amount for 
+MONTHLY PRE AMT TOT 
+ DTP Reporting Category 
+Date 
+ 
+N1 segment for “MONTHLY PRE AMT TOT” will 
+always be accompanied by DTP segment. The DTP 
+value will represent the month for which the 
+premium amount is applicable for. For example, 
+Premium for November 2020, the associated 
+DTP03 field will be populated as 20201101. 
+ DTP01 Date / Time 
+Qualifier 007 Effective (First of each month) 
+ DTP02 Date Time Period 
+Format Qualifier D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time Period  
+The Exchange will send the start date of the month 
+for which the MONTHLY PRE AMT TOT is 
+applicable. Except for birth where the child added 
+contains the date of birth for the birth month, and 
+all other members display standard start date of 
+the month. 
+2750 N1 Reporting Category  
+Custom segment added to the Exchange to 
+transmit APTC monthly amounts 
+ N101  75 Participant 
+ N102   
+The Exchange will send “MONTHLY APTC AMT” 
+value, representing the Monthly APTC value in the 
+Exchange system 
+ REF   
+N1 segment for “MONTHLY APTC AMT” will always 
+be accompanied by REF segment 
+ REF01  9X Account Category 
+ REF02   
+The Exchange will the dollar value amount for 
+MONTHLY APTC AMT 
+
+--- PAGE 41 ---
+© GetInsured 2023 All Rights Reserved.         41 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ DTP   
+N1 segment for “MONTHLY APTC AMT” will always 
+be accompanied by DTP segment. The DTP value 
+will represent the month for which the APTC 
+amount is applicable for. For example, for APTC for 
+November 2020, the associated DTP03 field will be 
+populated as 20201101. 
+ DTP01  007 Effective (First of each month) 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   
+The Exchange will send the start date of the month 
+for which the MONTHLY APTC AMT is applicable. 
+Except for birth where the child added contains 
+the date of birth for the birth month, and all other 
+members display standard start date of the month. 
+2750 N1 Reporting Category  
+Custom segment added to the Exchange to 
+transmit state subsidy monthly amounts. Note: 
+Configurable by state to enable state subsidy.  
+ N101  75 Participant 
+ N102   
+The Exchange will send “MONTHLY STATE SUBSIDY 
+AMT” value, representing the Monthly state 
+subsidy amount in the Exchange system. If 
+configuration is enabled, and if consumer is not 
+State Subsidy eligible, 0.00 is sent. 
+ REF   
+N1 segment for “MONTHLY STATE SUBSIDY AMT” 
+will always be accompanied by REF segment 
+ REF01  9X Account Category 
+ REF02   
+The Exchange will the dollar value amount for 
+MONTHLY STATE SUBSIDY AMT 
+ DTP   
+N1 segment for “MONTHLY STATE SUBSIDY AMT” 
+will always be accompanied by DTP segment. The 
+DTP value will represent the month for which the 
+state subsidy amount is applicable for. For 
+example, for state subsidy for November 2020, the 
+
+--- PAGE 42 ---
+© GetInsured 2023 All Rights Reserved.         42 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+associated DTP03 field will be populated as 
+20201101. 
+ DTP01  007 Effective (First of each month) 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+ DTP03   
+The Exchange will send the start date of the month 
+for which the MONTHLY STATE SUBSIDY AMT is 
+applicable. Except for birth where the child added 
+contains the date of birth for the birth month, and 
+all other members display start date of the month. 
+2750 N1 Reporting Category  
+Custom segment added to the Exchange to 
+transmit monthly Net Premium amounts 
+ N101  75 Participant 
+ N102   
+The Exchange will send “MONTHLY TOT RES AMT” 
+value, representing the Monthly Total Individual 
+Responsibility amount (net premium) in the 
+Exchange system 
+ REF   
+N1 segment for “MONTHLY TOT RES AMT” will 
+always be accompanied by REF segment 
+ REF01  9X Account Category 
+ REF02   
+The Exchange will the dollar value amount for 
+MONTHLY TOT RES AMT 
+ DTP   
+N1 segment for “MONTHLY TOT RES AMT” will 
+always be accompanied by DTP segment. The DTP 
+value will represent the month for which the Net 
+Premium amount is applicable for. For example, 
+for Net Premium for November 2020, the 
+associated DTP03 field will be populated as 
+20201101. 
+ DTP01  007 Effective (First of each month) 
+ DTP02  D8 Date Expressed in Format CCYYMMDD 
+
+--- PAGE 43 ---
+© GetInsured 2023 All Rights Reserved.         43 
+Table or 
+Loop Element Industry / Element 
+Name Code Instruction 
+ DTP03   
+The Exchange will send the start date of the month 
+for which the MONTHLY TOT RES AMT is 
+applicable. Except for birth where the child added 
+contains the date of birth for the birth month, and 
+all other members display standard start date of 
+the month. 
+ 
+ 
+11.1.3. Behavior of Standard 2750 Loop and Custom Monthly 2750 Loop 
+Refer to the table below highlighting key behavior of both the standard 2750 and custom monthly 2750 
+loops. Included are comments for general behavior for data elements in the 2750 loops.  
+Included are rules of how configuration setting influence dates in the standard 2750 loop. An example with 
+dates is provided for two use cases where mid-month exceptions occur. 
+There are three system configurations that could influence the data populated in the standard 2750 and 
+custom monthly 2750 loop. The Exchange determines how these configurations are set and are applicable to 
+all Issuers for that Exchange. 
+• State Subsidy:  Enables Exchange to support state subsidy. 
+• Financial Effective Date Alignment3:  When one financial amount changes in the standard 2750 loop, 
+the effective date for all other financials are updated with the same value. 
+• Allow Mid-Month Financial Effective Date3:  For birth, adoption, or death use cases, when a mid-
+month effective date applies, all financials are updated with the same value. 
+The custom monthly loops are repeated for each member. Data contains the total amounts for all members. 
+The custom monthly loops DTP03 date will always reflect the 1st of the month, for the 12 monthly buckets 
+for all members of the enrollment. (20200101, 20200201, etc.) 
+Table 10. Reporting Category standard 2750 and custom monthly 2750 loop behavior and exceptions  
+Data element description 2750  
+loop type Comment 
+  General behavior 
+• Amount for all financials 
+(APTC, CSR, State subsidy, 
+Individual member/ 
+Net/Gross premium) 
+Standard 
+Each amount sent (APTC, CSR, OTH PAY AMT 1, PRE AMT 1, TOT RES AMT, and      
+PRE AMT TOT) reflects the last month of coverage period (i.e. last slice).  
+Amounts are never prorated 
+• CSR loop Standard CSR sent only when applicable 
+• Additional Maintenance 
+Reason (OLD POLICY ID) Standard Old policy ID is sent when term and passively re-enrolled into a new plan under the 
+same Issuer 
+
+--- PAGE 44 ---
+© GetInsured 2023 All Rights Reserved.         44 
+• Amount for APTC  
+Standard 
+& Custom 
+monthly 
+1. If a consumer is eligible for APTC and consumes APTC, both the standard 
+reporting category and the custom 2750 loops both show the amount of APTC 
+consumed. 
+2. If a consumer is eligible for APTC and does not consume APTC, the standard 
+reporting category and the custom 2750 loops both show 0.00. 
+3. If a consumer is not eligible for APTC, the standard reporting category and the 
+custom 2750 loops both show 0.00.1 
+Amounts are never prorated. Amounts are capped if applicable. 
+• Amount for State Subsidy2 
+Standard 
+& Custom 
+monthly 
+1. If a consumer is eligible for state subsidy and consumes state subsidy, both the 
+standard reporting category and the custom 2750 loops both show the amount 
+of state subsidy consumed. 
+2. If a consumer is eligible for state subsidy and does not consume state subsidy, 
+the standard reporting category and the custom 2750 loops both show 0.00. 
+3. If a consumer is not eligible for state subsidy, the standard reporting category 
+and the custom 2750 loops both show 0.00. 
+Amounts are never prorated. Amounts are capped if applicable. 
+• CSR loop Custom 
+monthly CSR not sent 
+• Individual member premium Custom 
+monthly Individual member premium not sent 
+• Date for all financials for all 
+members 
+Custom 
+monthly Reflects 1st of each month of coverage 
+State subsidy  
+configuration options  State Subsidy  
+not enabled 
+State Subsidy 
+enabled     
+• State Subsidy  
+(OTH PAY AMT 1) Standard State subsidy  
+not sent 
+State subsidy 
+always sent     
+• State Subsidy Custom 
+monthly 
+State subsidy  
+not sent 
+State subsidy 
+always sent     
+ 
+ 
+ 
+Use case: Mid-month death of member (Example: death on 3/14, reported on 4/10, assume APTC change, no CSR or SS change) 
+Effective date configuration 
+options  No alignment,  
+No mid-month 
+Yes alignment,  
+No mid-month 
+No alignment,  
+Yes mid-month 
+Yes alignment,  
+Yes mid-month3 
+• Date for APTC 
+• Date for Premium financials 
+(Individual member/ 
+Gross/Net premium) 
+• Date for CSR 
+• Date for State Subsidy 
+Standard 
+Only if amount 
+changes, align to 
+1st of month after 
+death, else 
+previous date  
+(e.g. 1/1) 
+Regardless if 
+amount changes, 
+align to 1st of 
+month after 
+death 
+Only if amount 
+changes, align to 1 
+day after death, 
+else previous date 
+(e.g. 1/1) 
+Regardless if 
+amount changes, 
+align to 1 day after 
+death 
+Example: 
+APTC 
+Individual member premium 
+Gross premium 
+Net premium 
+CSR, if applicable 
+State Subsidy, if applicable 
+ 
+Standard 
+ 
+4/1 
+1/1 
+4/1 
+4/1 
+1/1 
+1/1 
+ 
+4/1 
+4/1 
+4/1 
+4/1 
+4/1 
+4/1 
+ 
+3/15 
+1/1 
+3/15 
+3/15 
+1/1 
+1/1 
+ 
+3/15 
+3/15 
+3/15 
+3/15 
+3/15 
+3/15 
+    Exception behavior 
+• Amount for all financials 
+(APTC, State subsidy, 
+Net/Gross premium) 
+Custom 
+monthly 
+In the event of retroactive changes, updated monthly amounts are sent for each of 
+the impacted months 
+• Amount for Premium 
+financials (Gross/Net 
+premium) 
+Custom 
+monthly Gross/Net premium amount prorated for month of death 
+ 
+ 
+ 
+
+--- PAGE 45 ---
+© GetInsured 2023 All Rights Reserved.         45 
+ 
+Use case: Mid-month birth or adoption (Example: birth on 3/15, reported on 4/10, assume APTC change, no CSR or SS change) 
+Effective date  
+configuration options  No alignment,  
+No mid-month 
+Yes alignment,  
+No mid-month 
+No alignment,  
+Yes mid-month 
+Yes alignment,  
+Yes mid-month3 
+• Date for APTC (per 1095A 
+regulations, IRS Form 8962) 1 Standard 
+Regardless if 
+amount changes, 
+override to 1st of 
+month of birth  
+Regardless if 
+amount changes, 
+override to 1st of 
+month of birth 
+Regardless if 
+amount changes, 
+override to 1st of 
+month of birth 
+Regardless if 
+amount changes, 
+override to 1st of 
+month of birth 
+ 
+• Date for Premium financials 
+(Individual member/ 
+Gross/Net premium) 
+• Date for CSR 
+• Date for State Subsidy 
+ 
+  
+Standard 
+If amount changes, 
+align to 1st of 
+month after birth, 
+else previous date 
+(e.g. 1/1) 
+Regardless if 
+amount changes, 
+align to 1st of 
+month after birth 
+If amount 
+changes, align to 
+date of birth, else 
+previous date 
+(e.g. 1/1) 
+Regardless if 
+amount changes, 
+align to date of 
+birth 
+Effective date  
+configuration options  No alignment,  
+No mid-month 
+Yes alignment,  
+No mid-month 
+No alignment,  
+Yes mid-month 
+Yes alignment,  
+Yes mid-month3 
+Example: 
+APTC 
+Individual member premium 
+Gross premium 
+Net premium 
+CSR, if applicable 
+State Subsidy, if applicable 
+ 
+Standard 
+ 
+3/1 
+1/1 (3/15 baby) 
+4/1 
+4/1 
+1/1 
+1/1 
+ 
+3/1 
+4/1 (3/15 baby) 
+4/1 
+4/1 
+4/1 
+4/1 
+ 
+3/1 
+1/1 (3/15 baby) 
+3/15 
+3/15 
+1/1 
+1/1 
+ 
+3/1 
+3/15 (3/15 baby) 
+3/15 
+3/15 
+3/15 
+3/15 
+    Exception behavior 
+• Date for added baby 
+(Individual member 
+premium) 
+Standard Reflects date of birth 
+• Amount for all financials 
+(APTC, State subsidy, 
+Net/Gross premium) 
+Custom 
+monthly 
+In the event of retroactive changes, updated monthly amounts are sent for each of 
+the impacted months 
+• Amount for Premium 
+financials (Gross/Net 
+premium) 
+Custom 
+monthly 
+Gross/Net premium reflects the calculated prorated amount for month of birth 
+Calculation:  Total Prem Amt / # days in month = daily amount x number of days of 
+coverage = prorated amount 
+• Date for all financials for 
+added baby 
+Custom 
+monthly For the birth month custom monthly buckets, reflects date of birth 
+ 
+1 Changed with 20.9 release.  
+2 State subsidy loops are sent only when the configuration for the Exchange is enabled. Custom monthly state subsidy. 
+3 Override for allow mid-month effective date takes precedence over financial effective date alignment. 
+ 
+11.1.4. Child Only Enrollment 
+An enrollment policy where no adult is enrolled is considered a child only enrollment. Note the following: 
+• The youngest child is the subscriber to limit subscriber flip on the policy due to subscriber aging out. 
+o Child subscriber is designated in the 2000 INS loop with INS02 relationship code = 18 
+o If an adult is later added to a child only policy, the youngest child remains the subscriber. 
+• 2100G Responsible Person loop where NM101 = QD contains  
+o Household primary tax filer for financial enrollments   
+o Household primary contact for non-financial enrollments 
+
+--- PAGE 46 ---
+© GetInsured 2023 All Rights Reserved.         46 
+11.2. Cancellation Supplemental Instructions (Subscriber / Enrollment Level) 
+Following the CMS standard companion guide, a cancellation transaction can be initiated by either the 
+Exchange or the QHP Issuer. A cancellation transaction is initiated when the enrollment is to be ended 
+without coverage ever being effectuated. A cancellation can occur any time prior to, on or after, the 
+effective date of initial coverage. A cancellation is defined by the enrollment end date being equal to the 
+enrollment start date. 
+The Exchange will send a cancellation transaction to the QHP Issuer for a variety of reasons including the 
+individual getting coverage through an employer or another employer and moving out of a coverage area 
+before coverage has started.  
+All members of an enrollment group are included in maintenance 834 transactions except for cancel/term of 
+the subscriber, when only the subscriber loop is sent. 
+Additional maintenance reason codes that have suffix qualifiers (e.g., “CANCEL-NLE,” “TERM-OTH”) are not 
+supported by the Exchange. 
+Table 11. Cancellation Supplemental Instructions (Subscriber / Enrollment Level) 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 024 Cancellation or Termination 
+ INS04 Maintenance 
+Reason Code ** The Exchange to QHP Issuer. Any valid 
+Maintenance Reason Code may be used 
+ INS08 Employment 
+Status Code TE The Exchange will send “TE” for cancellation and 
+termination transactions 
+2000 REF Subscriber 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number 
+ REF02 Subscriber 
+Identifier 
+ 
+The Exchange Assigned ID of the primary 
+coverage person 
+
+--- PAGE 47 ---
+© GetInsured 2023 All Rights Reserved.         47 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown below when they were 
+present on the Initial Enrollment 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member ID  
+23 QHP Issuer Assigned Member ID  
+ZZ QHP Issuer Assigned Subscriber ID  
+1L Exchange Assigned Policy ID  
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+2000 DTP Member Level 
+Dates 
+  
+ DTP01 Date Time 
+Qualifier 
+357 Eligibility End Date – for cancellation must not 
+be prior to enrollment date 
+(differs from CMS) Note: Sent at member level 
+for cancel/term transactions 
+ DTP03 
+Status 
+Information 
+Effective Date 
+ 
+The eligibility end date of the cancellation must 
+match the benefit begin date sent on the Initial 
+Enrollment 
+2300 HD Health Coverage   
+ HD01 Maintenance 
+Type Code 024 Cancellation or Termination 
+2300 DTP Health Coverage 
+Dates 
+  
+ DTP01 Date Time 
+Qualifier 
+349 
+ 
+Enrollment Period End Date – for cancellation 
+must match the Eligibility End Date. (differs 
+from CMS) 
+2300 REF Health Coverage 
+Policy Number 
+  
+
+--- PAGE 48 ---
+© GetInsured 2023 All Rights Reserved.         48 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+CE 
+QHP ID Purchased is the Assigned Plan Identifier 
+(standard component identifier) plus the 
+Variation Component (HIOS ID) 
+1L Exchange Assigned Policy ID. This is the 
+Exchange internal enrollment id. 
+X9 
+QHP Issuer Assigned Health Coverage Purchased 
+Policy ID Number.  
+Sent on maintenance (001), cancel/term (024) 
+transactions, and reinstatement (025) 
+transactions, if provided on inbound 
+confirmation transaction 
+ZZ 
+Will transmit with the Client ID (HouseHold Case 
+ID). In the case of custom grouping (multiple 
+health enrollments for the same household), 
+the Client ID is the same for each enrollment. 
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is required for all 
+cancellations. See Section 9.6 of the CMS guide 
+for explicit instructions related to loop 2700 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 of the CMS guide 
+for explicit instructions related to the 2750 loop 
+ N102 
+Member 
+Reporting 
+Category Name 
+ Value = “ADDL MAINT REASON” 
+2750 REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+
+--- PAGE 49 ---
+© GetInsured 2023 All Rights Reserved.         49 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ 
+Value = “CANCEL” 
+Note: The other additional maintenance reasons 
+listed for cancellations in the CMS Companion 
+Guide will not be sent by the Exchange. 
+ 
+11.3. Cancellation Supplemental Instructions (Member Level) 
+A cancellation transaction is initiated when the enrollment is to be ended without coverage ever being 
+effectuated. A cancellation can occur any time prior to, on or after, the effective date of initial coverage. A 
+cancellation is defined by the enrollment end date being equal to the enrollment start date. 
+This transaction is used when the Exchange cancels individuals in the enrollment group rather than the 
+entire enrollment group. This will only be used by the Exchange to communicate member level cancellations 
+to Issuers. Issuers will not use this transaction to send cancellations to the Exchange. 
+All members of an enrollment group are included in maintenance 834 transactions except for cancel/term of 
+the subscriber, when only the subscriber loop is sent. 
+Additional maintenance reason codes that have suffix qualifiers (e.g., “CANCEL-NLE,” “TERM-OTH”) are not 
+supported by the Exchange. 
+Note: CMS does not use a member level cancellation transaction. 
+Table 12. Cancellation Supplemental Instructions (Member Level) 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 024 Cancellation or Termination 
+ INS04 Maintenance 
+Reason Code ** Any valid Maintenance Reason Code may be 
+used 
+ INS08 Employment 
+Status Code TE The Exchange will send “TE” for cancellation 
+and termination transactions 
+
+--- PAGE 50 ---
+© GetInsured 2023 All Rights Reserved.         50 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 REF Subscriber 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number 
+ REF02 Subscriber 
+Identifier 
+ The Exchange Assigned ID of the subscriber 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown below when they were 
+present on the Initial Enrollment 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member ID  
+23 QHP Issuer Assigned Member ID  
+ZZ QHP Issuer Assigned Subscriber  
+1L Exchange Assigned Policy ID  
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+2000 DTP Member Level 
+Dates 
+  
+ DTP01 Date Time 
+Qualifier 357 
+Eligibility End Date – for cancellation must not 
+be prior to enrollment date 
+(differs from CMS)  
+Note: Sent at member level for cancel/term 
+transactions 
+ DTP03 
+Status 
+Information 
+Effective Date 
+ 
+The eligibility end date of the cancellation must 
+match the benefit begin date sent on the Initial 
+Enrollment 
+2300 HD Health Coverage   
+ HD01 Maintenance 
+Type Code 024 Cancellation or Termination 
+
+--- PAGE 51 ---
+© GetInsured 2023 All Rights Reserved.         51 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2300 DTP Health Coverage 
+Dates 
+  
+ DTP01 Coverage Period 349 
+Enrollment Period End Date – for cancellation 
+must match the Eligibility End Date. (differs 
+from CMS) 
+2300 REF Health Coverage 
+Policy Number 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+CE 
+QHP ID Purchased is the Assigned Plan 
+Identifier (standard component identifier) plus 
+the Variation Component (HIOS ID) 
+1L Exchange Assigned Policy ID. This is the 
+Exchange internal enrollment id. 
+X9 
+QHP Issuer Assigned Health Coverage 
+Purchased Policy ID Number.  
+Sent on maintenance (001), cancel/term (024) 
+transactions, and reinstatement (025) 
+transactions, if provided on inbound 
+confirmation transaction 
+ZZ 
+Will transmit with the Client ID (HouseHold 
+Case ID). In the case of custom grouping 
+(multiple health enrollments for the same 
+household), the Client ID is the same for each 
+enrollment.  
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is required for all 
+terminations. See Section 9.6 of the CMS guide 
+for explicit instructions related to loop 2700. 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 for explicit 
+instructions related to the 2750 loop 
+
+--- PAGE 52 ---
+© GetInsured 2023 All Rights Reserved.         52 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ N102 
+Member 
+Reporting 
+Category Name 
+ Value = “ADDL MAINT REASON” 
+2750 REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ 
+Value = “CANCEL” 
+Note: The other additional maintenance 
+reasons listed for cancellations in the CMS 
+Companion Guide will not be sent by the 
+Exchange. 
+ 
+ 
+11.4. Termination Supplemental Instructions – (Subscriber / Enrollment Level) 
+A termination transaction is initiated by HIX when the enrollment is to be ended after coverage has been 
+effectuated. This transaction is sent at the subscriber level and terminates all members of the enrollment. 
+The Exchange will send a termination transaction to the QHP Issuer for a variety of reasons including the 
+individual getting coverage through an employer or another employer and moving out of a coverage area. 
+All members of an enrollment group are included in maintenance 834 transactions except for cancel/term of 
+the subscriber, when only the subscriber loop is sent. 
+Additional maintenance reason codes that have suffix qualifiers (e.g., “CANCEL-NLE,” “TERM-OTH”) are not 
+supported by the Exchange. 
+Table 13. Termination Supplemental Instructions (Subscriber / Enrollment Level) 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+
+--- PAGE 53 ---
+© GetInsured 2023 All Rights Reserved.         53 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ INS03 Maintenance 
+Type Code 024 Cancellation or Termination 
+ INS04 Maintenance 
+Reason Code ** 
+The Exchange to QHP Issuer. 
+Any valid Maintenance Reason Code may be 
+used. See Section 16.1 
+ INS08 Employment 
+Status Code TE The Exchange will send “TE” for cancellation 
+and termination transactions 
+2000 REF Subscriber 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number 
+ REF02 Subscriber 
+Identifier 
+ The Exchange Assigned ID of the subscriber 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown below when they were 
+present on the Initial Enrollment 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member  
+23 QHP Issuer Assigned Member ID  
+ZZ QHP Issuer Assigned Subscriber ID  
+1L Exchange Assigned Policy ID  
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+2000 DTP Member Level 
+Dates 
+  
+ DTP01 Date Time 
+Qualifier 357 
+Eligibility End Date 
+(differs from CMS) Note: Sent at member level 
+for cancel/term transactions 
+
+--- PAGE 54 ---
+© GetInsured 2023 All Rights Reserved.         54 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ DTP03 
+Status 
+Information 
+Effective Date 
+ 
+The eligibility end date of the termination must 
+be transmitted 
+2300 HD Health Coverage   
+ HD01 Maintenance 
+Type Code 024 Cancellation or Termination 
+2300 DTP Health Coverage 
+Dates 
+ Both dates will be sent 
+ DTP01 Coverage Period 349 
+ 
+Enrollment Period End Date – represents the 
+last date of coverage in which claims will be 
+paid for the individual being terminated. 
+(differs from CMS) 
+2300 REF Health Coverage 
+Policy Number 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+CE 
+QHP ID Purchased is the Assigned Plan 
+Identifier (standard component identifier) plus 
+the Variation Component (HIOS ID) 
+1L Exchange Assigned Policy ID. This is the 
+Exchange internal enrollment id 
+X9 
+QHP Issuer Assigned Health Coverage 
+Purchased Policy ID Number.  
+Sent on maintenance (001), cancel/term (024) 
+transactions, and reinstatement (025) 
+transactions, if provided on inbound 
+confirmation transaction 
+ZZ 
+Will transmit with the Client ID (HouseHold 
+Case ID). In the case of custom grouping 
+(multiple health enrollments for the same 
+household), the Client ID is the same for each 
+enrollment.  
+ REF02 Reference 
+Identification 
+ ID value for each REF01 qualifier transmitted 
+
+--- PAGE 55 ---
+© GetInsured 2023 All Rights Reserved.         55 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is required for all 
+terminations. See Section 9.6 of the CMS guide 
+for explicit instructions related to loop 2700. 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 for explicit 
+instructions related to the 2750 loop 
+ N102 
+Member 
+Reporting 
+Category Name 
+ Value = “ADDL MAINT REASON” 
+2750 REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ 
+Value = “TERM” 
+Note: The other additional maintenance 
+reasons listed for terminations in the CMS 
+Companion Guide will not be sent by the 
+Exchange. 
+ 
+ 
+11.5. Termination Supplemental Instructions (Member Level) 
+This transaction is used when the Exchange terminates individuals in the enrollment group rather than the 
+entire enrollment group. This will only be used by the Exchange to communicate member level terminations 
+to Issuers. Issuers will not use this transaction to send terminations to the Exchange. 
+All members of an enrollment group are included in maintenance 834 transactions except for cancel/term of 
+the subscriber, when only the subscriber loop is sent. 
+Additional maintenance reason codes that have suffix qualifiers (e.g., “CANCEL-NLE,” “TERM-OTH”) are not 
+supported by the Exchange. 
+
+--- PAGE 56 ---
+© GetInsured 2023 All Rights Reserved.         56 
+Table 14. Termination Supplemental Instructions (Member Level) 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 024 Cancellation or Termination 
+ INS04 Maintenance 
+Reason Code 
+ 
+Any valid Maintenance Reason Code may be 
+used. See Section 16.1 
+ INS08 Employment 
+Status Code TE The Exchange will send “TE” for cancellation 
+and termination transactions 
+2000 REF Subscriber 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number 
+ REF02 Subscriber 
+Identifier 
+ The Exchange Assigned ID of the subscriber 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown below when they were 
+present on the Initial Enrollment 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member ID  
+23 QHP Issuer Assigned Member ID  
+ZZ QHP Issuer Assigned Subscriber ID  
+1L Exchange Assigned Policy ID  
+2000 DTP Member Level 
+Dates 
+  
+ DTP01 Date Time 
+Qualifier 357 
+Eligibility End Date 
+(differs from CMS) Note: Sent at member level 
+for cancel/term transactions 
+
+--- PAGE 57 ---
+© GetInsured 2023 All Rights Reserved.         57 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ DTP03 
+Status 
+Information 
+Effective Date 
+ 
+The eligibility end date of the termination must 
+be transmitted 
+2300 HD Health Coverage   
+ HD01 Maintenance 
+Type Code 024 Cancellation or Termination 
+2300 DTP Health Coverage 
+Dates 
+ Both dates are required 
+ DTP01 Coverage Period 349 
+ 
+Enrollment Period End Date– represents the 
+last date of coverage in which claims will be 
+paid for the individual being terminated. 
+(differs from CMS) 
+2300 REF Health Coverage 
+Policy Number 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+CE 
+QHP ID Purchased is the Assigned Plan 
+Identifier (standard component identifier) plus 
+the Variation Component (HIOS ID) 
+1L Exchange Assigned Policy ID. This is the 
+Exchange internal enrollment id. 
+X9 
+QHP Issuer Assigned Health Coverage 
+Purchased Policy ID Number.  
+Sent on maintenance (001), cancel/term (024) 
+transactions, and reinstatement (025) 
+transactions, if provided on inbound 
+confirmation transaction 
+ZZ 
+Will transmit with the Client ID (HouseHold 
+Case ID). In the case of custom grouping 
+(multiple health enrollments for the same 
+household), the Client ID is the same for each 
+enrollment.  
+
+--- PAGE 58 ---
+© GetInsured 2023 All Rights Reserved.         58 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is required for all 
+terminations. See Section 9.6 of the CMS guide 
+for explicit instructions related to loop 2700. 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 for explicit 
+instructions related to the 2750 loop 
+ N102 
+Member 
+Reporting 
+Category Name 
+ Value = “ADDL MAINT REASON” 
+2750 REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ 
+Value = “TERM” 
+Note: The other additional maintenance 
+reasons listed for terminations in the CMS 
+Companion Guide will not be sent by the 
+Exchange. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 59 ---
+© GetInsured 2023 All Rights Reserved.         59 
+11.6. Change Transactions – The Exchange to QHP Issuer 
+The Exchange will issue a standard Change transaction to update information that has changed. Examples of 
+this would be name changes and contact information changes. For change transactions, the maintenance 
+type code follows the X12 standard and “001” will be sent.  
+2750 loop additional maintenance reason codes other than CANCEL, TERM, AGENT BROKER INFO, and 
+AUTORENEW are not supported by the Exchange. 
+All members of an enrollment group are included in maintenance 834 transactions except for cancel/term of 
+the subscriber, when only the subscriber loop is sent. 
+The following INS04 Maintenance Reason codes and 2750 SEP Reason are present only if consumer selected 
+that SEP reason for the change event, otherwise Maintenance Reason Code ‘AI’ and SEP REASON ‘AI-No 
+Reason Given’ are present. 
+Table 15. Change Events INS04 Maintenance Reason Codes and 2750 SEP REASON 
+INS04 Code Maintenance Reason 2750 loop SEP REASON 
+01 Divorce 01-Divorce 
+02 Birth 02-Birth 
+03 Death 03-Death 
+05 Adoption 05-Adoption 
+25 Change in Identifying Data Elements n/a 
+29 Benefit Selection n/a 
+31 Legal Separation 31-Legal Separation 
+32 Marriage 32-Marriage 
+43 Change of Location 43-Change of Location 
+AI No Reason Given AI-No Reason Given 
+ 
+  
+
+--- PAGE 60 ---
+© GetInsured 2023 All Rights Reserved.         60 
+11.7. Address Changes 
+The Exchange will send 1 or more transactions to the Issuer for a change of address. Mailing address 
+changes are handled independently of home address changes. See table below for example scenarios for a 
+change of home and/or mailing address.  
+Table 16. Change of address scenarios and expected transaction, Maintenance Reason Code (MRC), and 
+2750 Additional Reporting Category SEP REASON 
+Change of address 
+scenario 
+Maintenance  
+001-MRC  
+& 2750 Additional 
+Reporting Category 
+Termination  
+024-MRC  
+& 2750 Additional 
+Reporting Category 
+Addition 
+021-MRC  
+& 2750 Additional 
+Reporting Category 
+1. Home address 
+changes only within the 
+current rate area/ 
+coverage area of the 
+current plan ID. No 
+change to mailing 
+address. 
+Results in no change to 
+current plan. 
+Subscriber1 001-432 
+SEP REASON  
+43-Change of Location2 
+and 
+Other members 001-AI 
+SEP REASON 
+AI-No Reason Given 
+Contains new home 
+address and existing 
+mailing address 
+  
+2. Home address 
+changes only to a new 
+rate area/ outside the 
+coverage area of the 
+current plan ID, but 
+within the same state. 
+No change to mailing 
+address. 
+Results in current plan 
+not available, new plan 
+selected, and a new 
+policy. 
+ 
+ Subscriber only 024-432 
+SEP REASON  
+43-Change of Location2 
+Contains prior home 
+address and existing 
+mailing address 
+All members 021-EC 
+Contains new home 
+address and existing 
+mailing address 
+3. Home address change 
+only, no change to 
+mailing address, to an 
+address outside of 
+current state.  
+Results in no plans are 
+available to be selected 
+due to new home 
+address is out of state. 
+ Subscriber only 024-432 
+SEP REASON  
+43-Change of Location2 
+Contains prior home 
+address and existing 
+mailing address 
+ 
+
+--- PAGE 61 ---
+© GetInsured 2023 All Rights Reserved.         61 
+Change of address 
+scenario 
+Maintenance  
+001-MRC  
+& 2750 Additional 
+Reporting Category 
+Termination  
+024-MRC  
+& 2750 Additional 
+Reporting Category 
+Addition 
+021-MRC  
+& 2750 Additional 
+Reporting Category 
+4. Change to mailing 
+address only to an 
+address outside of the 
+current state. No 
+change to home 
+address.  
+Results in no change to 
+current plan. 
+For each member with a 
+new mailing address 001-
+43 
+Contains existing home 
+address and new mailing 
+address 
+ 
+For each member with no 
+change to mailing 
+address 001-AI 
+Contains existing home 
+address and existing 
+mailing address 
+ 
+  
+5. Change to Home 
+address and Mailing 
+address at the same 
+time within the current 
+rate area/ coverage area 
+of the current plan ID.  
+Results in no change to 
+current plan. 
+First 001 transaction: 
+For each member with a 
+new mailing address 001-
+43 
+Contains prior home 
+address and new mailing 
+address 
+ 
+For each member with no 
+change to mailing 
+address 001-AI 
+Contains existing home 
+address and existing 
+mailing address 
+ 
+Second 001 transaction: 
+Subscriber1 001-432 
+SEP REASON  
+43-Change of Location2 
+and 
+Other members 001-AI 
+SEP REASON 
+AI-No Reason Given 
+Contains new home 
+address and new mailing 
+address 
+  
+
+--- PAGE 62 ---
+© GetInsured 2023 All Rights Reserved.         62 
+Change of address 
+scenario 
+Maintenance  
+001-MRC  
+& 2750 Additional 
+Reporting Category 
+Termination  
+024-MRC  
+& 2750 Additional 
+Reporting Category 
+Addition 
+021-MRC  
+& 2750 Additional 
+Reporting Category 
+6. Change to Home 
+address and Mailing 
+address at the same 
+time outside the 
+coverage area of the 
+current plan ID, but 
+within the same state.  
+Results in current plan 
+not available, new plan 
+selected, and a new 
+policy. 
+For each member with a 
+new mailing address 001-
+43 
+Contains prior home 
+address and new mailing 
+address 
+ 
+For each member with no 
+change to mailing 
+address 001-AI 
+Contains existing home 
+address and existing 
+mailing address 
+ 
+Subscriber only 024-432 
+SEP REASON  
+43-Change of Location2 
+Contains prior home 
+address and new mailing 
+address 
+All members 021-EC 
+Contains new home 
+address and existing 
+mailing address 
+7. Change to Home 
+address and Mailing 
+address at the same 
+time, to an address 
+outside of current state.  
+Results in no plans are 
+available to be selected 
+due to new home 
+address is out of state. 
+For each member with a 
+new mailing address 001-
+43 
+Contains prior home 
+address and new mailing 
+address 
+ 
+For each member with no 
+change to mailing 
+address 001-AI 
+Contains prior home 
+address and existing 
+mailing address 
+ 
+Subscriber only 024-432 
+SEP REASON  
+43-Change of Location2 
+Contains prior home 
+address and new mailing 
+address 
+ 
+1 For home address change, the Maintenance Reason Code ‘43’ is present only for the member that is 
+designated as the Primary Contact for the household. Typically, the Primary Contact is the subscriber. 
+Maintenance Reason Code ‘AI’ is present for all other members. 
+2 For home address change, the Maintenance Reason Code ‘43’ and SEP REASON ’43-Change of Location’ are 
+present only if consumer selected a SEP reason for changing address, otherwise Maintenance Reason Code 
+‘AI’ and SEP REASON ‘AI-No Reason Given’ are present. 
+ 
+
+--- PAGE 63 ---
+© GetInsured 2023 All Rights Reserved.         63 
+11.8. Re-enrollment Supplemental Instructions 
+Following the CMS standard companion guide, a re-enrollment transaction is generated when a member 
+who has been terminated needs to be re-enrolled. A “subscriber flip” occurs when the subscriber is no 
+longer eligible for benefits or has left the household, resulting in the Health enrollment being automatically 
+terminated, and the remaining family members being re-enrolled in a new Health enrollment policy under a 
+new subscriber.  
+If a re-enrollment for a dependent occurs with or without a gap in coverage, a dependent add transaction to 
+re-enroll the dependent is generated with a single INS loop for the most recent coverage period for that 
+member with the 2300 DTP01 = 348 benefit begin date reflecting the start of the latest enrollment span. All 
+subsequent add, maintenance, or term transactions generated, also contain a single INS loop for that 
+member reflecting the latest enrollment span. 
+Note: If a mailing address update occurs after an enrollment is terminated that contains a re-enrollment 
+with or without a gap in coverage occurs for a member and a maintenance transaction is generated, 
+separate INS loops are included for each of the coverage periods for that member in the ST/SE for the 
+enrollment policy. To distinguish the two coverage periods, the first span contains both a 2300 loop DTP01 = 
+348 benefit begin date and DTP01 = 349 benefit end date, and the second span, assuming it remains active, 
+contains only a 2300 loop DTP01 = 348 benefit begin date.  
+Configurable at the Exchange level to send for all transactions or not send is the 2000 loop REF01 = 4A 
+Exchange Assigned Enrollee ID, which is used to provide a unique enrollee ID per coverage span during a 
+given coverage year. 
+ 
+Table 17. Re-enrollment Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 021 The Exchange will send “021” to indicate 
+Addition 
+ INS04 Maintenance 
+Reason Code AI No Reason Given 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown below when they were 
+present on the Initial Enrollment 
+
+--- PAGE 64 ---
+© GetInsured 2023 All Rights Reserved.         64 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+Q4 Prior Identification Number - The Exchange will 
+not transmit this field 
+ 
+11.9. Reinstatement Supplemental Instructions 
+Following the CMS standard companion guide, a reinstatement transaction is generated when a member 
+who has been terminated needs to be re-enrolled. A reinstatement is used when a member’s policy has 
+been terminated or canceled inappropriately and the coverage is reinstated with the original effective dates 
+and members (e.g., with no gap in coverage). 
+The reinstatement would contain the “last slice” value for all data elements, as existed at the time of the 
+termination or cancellation. Any changes made after the termination/cancellation end date would not be 
+captured in the reinstatement. 
+Table 18. Re-instatement Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 025 The Exchange will send “025” to indicate 
+reinstatement 
+ INS04 Maintenance 
+Reason Code 41 Re-enrollment will be used for reinstatement 
+transactions. 
+ 
+11.10. Change in Health Coverage 
+The Exchange will send two Coverage Level Change transactions to the QHP Issuer when a member’s health 
+coverage level changes. The first Coverage Level Change transaction will convey a health coverage 
+termination for the old coverage level and a second Coverage Change transaction will convey a health 
+coverage level addition (new coverage). For these transactions, multiple ST/SE will be sent and one INS 
+segment per person. 
+
+--- PAGE 65 ---
+© GetInsured 2023 All Rights Reserved.         65 
+11.11. Change in Circumstance 
+Unlike the CMS companion guide, the Exchange will send the normal set of transactions (add, change) for 
+changes of circumstance. The Exchange does not use the CMS CIC cancel/term and re-enroll process. There 
+are circumstances that will result in the existing enrollment being terminated (024) and a new enrollment 
+being added (021), including: 
+• Member experiences a Qualifying Life Event (QLE) meriting a Special Enrollment Period (SEP) allowing 
+for a plan change. See Section 11.16 QLE Identifiers 
+• When a subscriber is no longer eligible for benefits and the remaining family members are re-enrolled 
+under a new subscriber. See Section 11.8 Re-enrollment and Section 11.16 QLE Identifiers 
+• Member income changes resulting in Cost Sharing Reduction (CSR) eligibility changes. See Section 11.16 
+QLE Identifiers 
+11.12. Add Member – Same Plan 
+When a new person is added to an existing enrollment (i.e., same plan is kept), an initial enrollment 
+transaction will be sent for the person being added and change transactions will be sent for all existing 
+members. The Exchange will add/remove the member to the existing Exchange Assigned Policy ID. This 
+process differs from CMS which uses a Change in Circumstance (CIC) cancel/term and re-enroll process for 
+the enrollment group. Non-subscriber member additions will be automatically effectuated/confirmed within 
+the Exchange system of record. For change transactions, the maintenance type code follows the X12 
+standard and “001” will be sent. 
+ 
+11.13. Add Member – Different Plan 
+When a new person is added to a new enrollment (i.e., plan changes), a termination transaction will be sent 
+for the entire household terminating the old plan. An add transaction will then be sent adding the 
+household to the new plan. Non-subscriber member additions to the new plan will be automatically 
+effectuated/confirmed within the Exchange system of record. For change transactions, the maintenance 
+type code follows the X12 standard and “001” will be sent. 
+ 
+11.14. Add / Term Dates (mid-month dates) 
+Add dates will be set to the first day of the month in which coverage begins except in the case of a birth, 
+adoption, and death. In the case of a birth, adoption, and death the coverage start date will be set to the 
+date of the event. Term dates will be set to the last day of the month in which coverage is ending except in 
+the case of a death. In the case of a death the coverage end date will be set to the date the death occurred. 
+For change transactions, the maintenance type code follows the X12 standard and “001” will be sent. 
+
+--- PAGE 66 ---
+© GetInsured 2023 All Rights Reserved.         66 
+In the event of death of a subscriber, the enrollment is termed with the coverage end date set to the date 
+the death occurred, and surviving members are re-enrolled in a new policy with a coverage begin date set to 
+one day after the date the death occurred.  
+• Exception scenario: If an enrollment is already in a future dated term status when subscriber 
+disenrollment occurs, the result is a subscriber flip on the existing policy and a maintenance 
+transaction is sent with the new subscriber. 
+11.15. Disenroll Member – Same plan 
+When a new person is removed (canceled/terminated) from an existing enrollment (i.e., same plan is kept), 
+a cancellation/termination transaction will be sent for the person being disenrolled and change transactions 
+will be sent for all existing members. For change transactions, the maintenance type code follows the X12 
+standard and “001” will be sent. 
+11.16. QLE (Qualifying Life Event) Identifiers 
+When a QLE is granted outside of the Open Enrollment Period that impacts the household composition, the 
+Exchange will add/remove the member to the existing Exchange Assigned Policy ID. This process differs from 
+CMS which uses a Change in Circumstance (CIC) cancel/term and re-enroll process for the enrollment group. 
+The Exchange will send details of the QLE to Issuers at the 2750 loop. The rationale here is that Issuers may 
+want some record traceable back to the 834 for audit purposes. 
+There is a total of five different QLE Identifiers we currently send to Issuers via the 834. These are found at 
+2750 loops for all members. Differs from CMS companion guide, which does not use the N102 ‘SEP’ value. 
+● 90-Qualifying Life Event 
+● 91-Plan Change 
+● 92-Subscriber Change 
+● 93-CS Level Change 
+● 95-Tobacco Flag Change 
+Example data: 
+LX*7~ 
+N1*75*SEP~ 
+REF*17*90-Qualifying Life Event~ 
+DTP*007*D8*20200212~ 
+11.17. SEP (Special Enrollment Period) Identifiers 
+When a SEP is granted outside of the Open Enrollment Period that impacts the household composition, the 
+Exchange will add/remove the member to the existing Exchange Assigned Policy ID. This process differs from 
+CMS which uses a Change in Circumstance (CIC) cancel/term and re-enroll process for the enrollment group. 
+The Exchange will send details of the SEP reason to Issuers at the 2750 loop. The rationale here is that 
+Issuers may want some record traceable back to the 834 for audit purposes. 
+
+--- PAGE 67 ---
+© GetInsured 2023 All Rights Reserved.         67 
+The SEP reason codes typically correlate to the INS04 value set found in the CMS companion guide and will 
+contain both the numeric code and the text label associated with that code. For example, “05” would be 
+transmitted as “05-Adoption.” These are found at the 2750 loops for all members. There is a subset of SEP 
+reason codes not supported by the Exchange which differs from CMS (EX-EXCEPTIONAL CIRCUMSTANCES, 
+FC-FINANCIAL CHANGE, NE-NEWLY ELIGIBLE, QS-QSEHRA, HR-ICHRA).  
+Note: This segment, while typically associated with Term and Change transactions, may be populated with 
+Adds and Reinstatements. See Section 11.6 Table 15 for alignment of INS04 to SEP REASON values. 
+Example data: 
+LX*3~ 
+N1*75*SEP REASON~ 
+REF*17*05-Adoption~ 
+DTP*007*D8*20200404~ 
+11.18. Demographic Changes – Incorrect Member Information 
+When a demographic change is made that impacts and of the following elements, the 2100B Incorrect 
+Member Loop (NM1, DMG) will be sent in the 834 transaction. NM1 elements:  Last Name, First Name, 
+Middle Name, Suffix, and/or SSN. DMG elements: Birth Date, Gender, Marital Status, Race/Ethnicities, 
+and/or Citizenship. 
+Table 19. Incorrect Member Loop Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2100B  
+Incorrect 
+Member Name 
+Loop 
+ 
+This loop does not apply to initial enrollments. 
+This loop will be used in maintenance 
+transactions only when there are changes to 
+identifying or demographic information so that 
+Issuers can use it to make the necessary 
+updates to their system. (001*25).  
+2100B NM1 Incorrect 
+Member Name 
+ 
+This segment will be populated with the prior 
+Name, and/or SSN value of the member when 
+there is a change to the Name, SSN, or 
+Demographic data. The SSM will be populated 
+only if it has changed. Please refer to TR3 
+documentation for additional information. 
+ NM101  70 Prior Incorrect Insured 
+
+--- PAGE 68 ---
+© GetInsured 2023 All Rights Reserved.         68 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2100B DMG 
+Incorrect 
+Member 
+Demographics 
+ 
+This segment will be populated with only the 
+prior values of Date of Birth, Gender, Marital 
+Status, Race/Ethnicities, and/or Citizenship that 
+have changed. For Race/Ethnicities updates, 
+the predecessor selection of Race/Ethnicity 
+selections will be sent in this loop. Please refer 
+to TR3 documentation for additional 
+information. 
+ 
+11.19. Agent Broker Delegation and Information Changes 
+The Agent of Record for an enrollment is sent with initial enrollment, maintenance, termination, 
+reinstatement, and/or renewal transactions when an active delegation exists. Issuers should update their 
+records based on the information that is populated in Loop 1000C and 1100C of the EDI transaction.  
+• If an agent delegation is added after the enrollment transaction was sent to the Issuer, it is sent as a 
+maintenance transaction with the reason code “AI” and the agent’s information is populated in Loop 
+1000C and 1100C.  
+• If an agent delegation is removed after the enrollment transaction was sent to the Issuer, it is sent 
+as a maintenance transaction with the reason code “AI” and Loops 1000C and 1100C are not 
+populated.  
+• If the user opts to change the Agent of Record delegation from Agent A to Agent B for an enrollment 
+record, there will be one maintenance transaction for the removal of Agent A and a second 
+maintenance transaction for the addition of Agent B. 
+• If the Agent Information (agent name, agent tax ID, and/or agent license number) is changed for a 
+delegated agent after the enrollment transaction was sent to the Issuer, the updated 
+agent information populated in Loop 1000C and 1100C is sent in the next 834 maintenance 
+transaction for the enrollment. Configurable by state to trigger an 834 maintenance transaction 
+when the delegated agent information is updated. 
+• For the above scenarios, applies to all active enrollment(s) in the current year as well as any active 
+enrollment created during Renewals or Open Enrollment Period for the upcoming year.  
+For each maintenance transaction with an agent delegation, agent de-delegation, or change to agent 
+information, an indicator is populated in Loop 2750 when configuration is enabled.  Configurable by state to 
+send the 2750 loop Additional Maintenance Reason of AGENT BROKER INFO for maintenance and 
+reinstatement transactions, when applicable. The update is effective as of the maintenance effective date 
+(Value 303) in Loop 2000. 
+
+--- PAGE 69 ---
+© GetInsured 2023 All Rights Reserved.         69 
+Table 20. Additional Maintenance Reason AGENT BROKER INFO Loop Supplemental Instructions 
+2750 N1 Reporting Category  
+Reporting Category for Agent Broker changes 
+Note: This segment will appear for all members 
+when applicable. 
+Note: This segment, while typically associated 
+with Change transactions, may be populated with 
+Reinstatements.  
+Note: Configurable by state. If configuration is 
+enabled this segment will appear when changes to 
+Agent Broker designation or information changes 
+(e.g. name, tax ID, or NPN in the N1*BO or ACT01) 
+ N101  75 Participant 
+ N102   Value = “ADDL MAINT REASON”  
+ REF01  17 Client Reporting Category 
+ REF02   
+Value = “AGENT BROKER INFO” indicates a change 
+to agent information or delegation on an existing 
+enrollment. 
+ 
+  
+
+--- PAGE 70 ---
+© GetInsured 2023 All Rights Reserved.         70 
+12. Issuer to the Exchange Business Scenarios For 834 
+This section describes other transactions that are patterned after the initial enrollment. 
+ 
+12.1. Overview of the Exchange Inbound Processing Rules 
+The Exchange requires that all inbound 834 from Issuers are sent in single line wrapped format with the 
+Tilde ‘~’ line terminator. Refer to Section 7 for details. Files are accepted at any time. Files are processed 
+into the Exchange system once per day.  
+For ISA/GS control segment details, refer to Section 9. Note: For inbound to Exchange transactions, 
+validations include the following or will result in a TA1/999 rejection:  
+• ISA01 and ISA03 must be “00”. 
+• ISA05 and ISA07 must be “ZZ”. 
+• ISA14 must be “1” for 834 transaction. 
+• ISA15 must be “P” for production, and “T” for test .  
+o If ISA15 is incorrect, the transaction will reject and generate a TA1 rejection with TA105 
+Interchange Note Code “020” – Invalid Test Indicator Value.  
+The Exchange Assigned Policy ID must always be sent in both the 2000 and 2300 loops. If Issuers do not pass 
+the Policy ID in both loops, the transaction will be rejected. The Exchange processes all inbound transactions 
+at subscriber (enrollment) level. Therefore, Issuers should always include subscriber information in any 
+inbound transaction. The Exchange Assigned Member ID must also always be included when member level 
+information is sent.  
+The Exchange also validates the End date passed by Issuers in the Term and Cancel transactions. For 
+processing cancellations, the Exchange requires the Issuer-sent end date to match the start date in the 
+Exchange system. Similarly, for processing terminations, the Exchange requires the Issuer-sent end date to 
+be greater than the start date in the Exchange system. 
+Issuers are not allowed to term or cancel an enrollment for any reason other than non-payment. The 
+transaction will be rejected if Issuers do not send this field or populate it with reason code other than 59 
+(non-payment). The Exchange will not accept reinstatement transactions from Issuers. Issuers would need to 
+communicate with the Exchange to initiate and provide reasoning for any other re-instatement, term, or 
+cancel transaction. 
+The table below outlines these validation rules in more detail: 
+
+--- PAGE 71 ---
+© GetInsured 2023 All Rights Reserved.         71 
+Table 21. Inbound 834 Validation Rules 
+Type Confirmation Cancellation Termination 
+Transaction Level Subscriber Level Subscriber Level Subscriber Level 
+Data Elements Updated 
+in the Exchange System 
+● Member Status 
+● Issuer IDs 
+● Last Payment Date 
+● Reason Code 
+● End Date 
+● Status 
+● Reason Code 
+● End Date 
+● Status 
+● Issuer IDs 
+● Last Premium Date 
+Validations Performed 
+● Reject if the 
+enrollment is in 
+Cancel status in the 
+Exchange system. 
+● Reject if Subscriber 
+information is 
+missing in the 
+Inbound 834 
+transaction. 
+● Reject if the 
+Exchange Assigned 
+Policy ID is missing 
+in the Inbound 834 
+transaction. 
+● Reject if the Start 
+Date sent in the 
+Inbound 834 
+transaction does not 
+match the Start Date 
+present in the 
+Exchange system. 
+ 
+● Reject if Reason 
+Code is not equal to 
+59 (non-payment) 
+● Reject if End Date is 
+greater than Start 
+Date in the 
+Exchange system. 
+● Reject if the year of 
+the cancel date does 
+not match with the 
+coverage year of the 
+policy in the 
+Exchange system. 
+ 
+● Reject if the 
+enrollment is in 
+Cancel status in the 
+Exchange system. 
+● Reject if End Date is 
+less than or equal to 
+the Start Date in the 
+Exchange system. 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 72 ---
+© GetInsured 2023 All Rights Reserved.         72 
+12.1.1. Inbound File Naming Convention 
+Files that do not adhere to the file naming convention identified below will be ignored for security purposes. 
+from_<HIOS ID>_<state_abbreviation>_834_INDV_<YYYYMMDDHHMMSS>.edi  
+For example: from_45142_NV_834_INDV_20190521114107.edi 
+ 
+12.1.2. Inbound Frequency File is Sent 
+Issuers can send multiple files throughout the day. GI system processes all files in order of receipt (e.g., first 
+in, first out) in a batch that occurs once a day. 
+ 
+12.2. Enrollment Confirmation / Effectuation Supplemental Instructions 
+The Exchange requires Issuers to send back effectuation for any newly assigned Exchange Assigned Policy ID. 
+The Exchange assigns a new Exchange Assigned Policy ID in the following scenarios.  
+● Consumer submits initial enrollment. 
+● Consumer manually renews via plan shopping for next coverage plan year. Manual renewals are 
+NOT auto effectuated by the Exchange and require effectuation from the Issuer.  
+● Consumer reports life change events and in the process terms their prior enrollment and starts a 
+new enrollment in the SEP period. Note: A new Exchange Assigned Policy ID will be assigned even if 
+the consumer picks the same plan with the same Issuer for their new enrollment. 
+● Consumer voluntarily disenrolls from their existing enrollment and enrolls again in the same plan.  
+● Consumer reports a life change event that makes the existing subscriber ineligible. In this case, the 
+Exchange will terminate or cancel the existing enrollment and create a new enrollment on the same 
+plan.  
+● Consumer reports life change events and in the process a CSR level change happens that terms the 
+prior enrollment and starts a new enrollment on a new plan. 
+The Exchange does not require Issuers to send back effectuation for any newly assigned Exchange Assigned 
+Policy ID in the following scenario: 
+● Passive renewal for the next coverage year when current year was previously effectuated. 
+For all the other scenarios, the Exchange retains the Exchange Assigned Policy ID and Issuers are not 
+expected to send back effectuation if they have effectuated the original enrollment. See some examples 
+below of such scenarios: 
+
+--- PAGE 73 ---
+© GetInsured 2023 All Rights Reserved.         73 
+● Consumer reinstates their prior enrollment. 
+● Consumer reports life change event on their effectuated enrollment and they keep the same plan in 
+the SEP period. 
+● Consumer voluntarily disenrolls or cancels their enrollment. 
+Note: Information about effectuation of Auto Renewals is provided in 13. Annual Renewals below. 
+Important Note: Issuers should resend the effectuation if the earlier sent effectuation was rejected by the 
+Exchange due to EDI errors.  
+Note: Configurable at the Exchange level, whether the confirmation / effectuation file is required for all 
+members or only for the subscriber.  
+ 
+ 12.2.1. Inbound Confirmation Segments 
+Following the CMS standard companion guide, the confirmation / effectuation file must contain all the 
+relevant data segments from the initial enrollment file in addition to the segments outlined below: 
+Table 22. Inbound Confirmation Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+Header BGN Beginning 
+Segment 
+  Must be present 
+ BGN06 
+Original 
+Transaction Set 
+Reference 
+Number 
+ 
+Transmit the value from 
+BGN02 in the initial 
+enrollment transaction 
+ 
+ BGN08 Action Code 2 Change (Update) Must be ‘2’ 
+Header QTY Transaction Set 
+Control Totals 
+ 
+If the transaction set control 
+totals sent with the Initial 
+Enrollment transaction are 
+not accurate for this 
+confirmation / effectuation, 
+transmit accurate totals 
+instead of the values 
+received in the Initial 
+Enrollment transaction 
+ 
+
+--- PAGE 74 ---
+© GetInsured 2023 All Rights Reserved.         74 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ QTY01 Quantity 
+Qualifier 
+TO 
+Total. Will transmit to 
+indicate that the value 
+conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set. It is required for 
+all transactions. 
+Must be present 
+DT 
+Dependent Total. Will 
+transmit to indicate that the 
+value conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set with INS01 = “N”. 
+It is required for all 
+transactions. 
+Must be present 
+ET 
+Employee Total. Will 
+transmit to indicate that the 
+value conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set with INS01 = “Y”. 
+The Exchange requires all 
+three be sent. 
+Must be present 
+1000A N1 Sponsor Name P5 Plan Sponsor Must be present 
+1000A N1 Payer IN Insurer Must be present 
+2000 INS Member Level 
+Detail 
+  Must be present 
+ INS03 Maintenance 
+Type Code 021 Addition Must be ‘021’ 
+ INS04 Maintenance 
+Reason Code 28 
+Will transmit “28” when the 
+QHP Issuer has effectuated 
+member coverage 
+Must be ‘28’ 
+
+--- PAGE 75 ---
+© GetInsured 2023 All Rights Reserved.         75 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ INS08 Employment 
+Status Code AC Active Must be ‘AC’ 
+2000 REF Subscriber 
+Identifier    
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number Must be present 
+ REF02 Subscriber 
+Identifier  
+The Exchange Assigned ID of 
+the primary coverage 
+person 
+Must be 10 
+numeric characters 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L 
+Transmit with the Exchange 
+Assigned Policy ID conveyed 
+in REF02. Policy ID is 
+mandatory in both 2000 and 
+2300 loops 
+Must be present 
+17 Exchange Assigned Member 
+ID sent in REF02 
+Must be 10 
+numeric characters 
+23 
+Transmit with the QHP 
+Issuer Assigned Member ID 
+conveyed in REF02 
+Highly 
+recommended 
+ZZ 
+Transmit with the QHP 
+Issuer Assigned Subscriber 
+ID conveyed in REF02 
+Highly 
+recommended 
+6O Payment Transaction ID 
+Must be 13 
+characters, first 2 
+are state code, last 
+11 must be 
+numeric 
+
+--- PAGE 76 ---
+© GetInsured 2023 All Rights Reserved.         76 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+2000 DTP File Effective 
+Date 
+ 
+Will transmit to indicate the 
+date the information was 
+gathered if that date is not 
+the same as ISA09/GS04 
+date 
+ 
+ DTP01 Date Time 
+Qualifier 303 Maintenance Effective Must be present 
+2100A NM1 Member Name IL Insured or Subscriber Must be present 
+2100 HLH01 Health Relate 
+Code 
+ Tobacco Usage Must be present 
+2100B NM1 
+Incorrect 
+Member Name 
+Loop 
+ 
+Do not transmit this NM1 
+loop where NM101 “70”, as 
+member information may 
+not be corrected in an 
+effectuation / confirmation 
+transmission 
+ 
+2300 HD Health Coverage   Must be present 
+ HD01 Maintenance 
+Type Code 
+021 Addition  
+ HD03 Insurance Line 
+Code 
+DEN Dental  
+HLT  Health  
+2300 DTP Health Coverage 
+Dates 
+ 
+Multiple iterations are 
+required.  
+ DTP03 Date Time 
+Qualifier 348 
+The Actual Enrollment Begin 
+Date. It must be 
+transmitted. Enrollment into 
+the QHP is not effectuated 
+until the initial premium has 
+been paid. 
+Must be present 
+
+--- PAGE 77 ---
+© GetInsured 2023 All Rights Reserved.         77 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+349 
+The Enrollment Period End 
+Date is optional. (differs 
+from CMS) 
+ 
+543 The Last Premium Paid 
+Date. Must be transmitted.  Must be present 
+343 
+Premium Paid to Date End 
+will not be sent (differs from 
+CMS) 
+Do not send 
+2300 REF Health Coverage 
+Policy Number 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L 
+Transmit with the Exchange 
+Assigned Policy ID conveyed 
+in REF02. Policy ID is 
+mandatory in both 2000 and 
+2300 loops. 
+Must be present 
+X9 
+Transmit with the QHP 
+Issuer assigned Health 
+Coverage Purchased Policy 
+Number conveyed in the 
+associated REF02 element 
+ 
+2000 LS 
+Additional 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is 
+required for all 
+confirmations. See Section 
+9.6 of the CMS guide for 
+explicit instructions related 
+to loop 2700. 
+Must be present 
+ LS01 Loop Identifier 
+Code 2700  Must be ‘2700’ 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is 
+required for all 
+confirmations. See Section 
+9.6 of the CMS guide for 
+Must be present 
+
+--- PAGE 78 ---
+© GetInsured 2023 All Rights Reserved.         78 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+explicit instructions related 
+to loop 2700. 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 
+of the CMS guide for explicit 
+instructions related to the 
+2750 loop 
+Must be present 
+ N102 
+Member 
+Reporting 
+Category Name 
+ 
+Value = “ADDL MAINT 
+REASON” 
+Must be ‘ADDL 
+MAINT REASON’ 
+2750 REF 
+Reporting 
+Category 
+Reference 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category Must be ‘17’ 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ Value = “CONFIRM” Must be ‘CONFIRM’ 
+2000 LE 
+Additional 
+Reporting 
+Categories Loop 
+Termination 
+   
+2000 LE01 Loop Identifier 
+Code 2700   
+1 Note: where is indicated in the validation column, that data element is validated for possible 834 rejection 
+or 2nd level business validation rejection for inbound to Exchange transactions. 
+ 
+ 
+
+--- PAGE 79 ---
+© GetInsured 2023 All Rights Reserved.         79 
+12.2.2. Inbound Confirmation Sample 
+The sample file includes segments that could be sent back in the confirmation file. Not all segments are 
+mandatory to pass technical and business rules. The green highlighted rows indicate mandatory elements 
+that must be included in the file. All other segments are valid, but they are not used in the effectuation 
+process. 
+Usage:  M – Mandatory, H/R – Highly Recommended, E – Exclude, O – Optional   
+Table 23. Inbound Confirmation Sample 
+Usage EDI Additional description of mandatory segment 
+M 
+ 
+ 
+M 
+ 
+M 
+M 
+ 
+O 
+M 
+M 
+M 
+M 
+M 
+O 
+O 
+M 
+M 
+M 
+M 
+H/R 
+H/R 
+M 
+E 
+M 
+O 
+M 
+O 
+O 
+O 
+O 
+M 
+O 
+O 
+O 
+O 
+ISA*00*          *00*          *ZZ*444761189      
+*ZZ*AK0            
+*190521*1140*^*00501*191410004*1*P*:~ 
+GS*BE*444761189*AK0*20190521*1140*191410
+004*X*005010X220A1~ 
+ST*834*000000001*005010X220A1~ 
+BGN*00*AK0191410004000000001*20190521*11
+40*ET*4514220190412132627**2~ 
+DTP*303*D8*20190521~ 
+QTY*DT*0~ 
+QTY*ET*1~ 
+QTY*TO*1~ 
+N1*P5*John Doe*FI*299499975~ 
+N1*IN*Healthplan, Inc.*FI*269999189~ 
+N1*BO*Fred Smith*FI*123321123 
+ACT*3683790 
+INS*Y*18*021*28*A***AC~ 
+REF*0F*1000111499~ 
+REF*1L*234~ 
+REF*17*1000111499~ 
+REF*23* U9999955801~ 
+REF*ZZ* U99999558~ 
+REF*6O*AK00000000006~ 
+REF*4A*434343~ 
+DTP*303*D8*20190412~ 
+DTP*356*D8*20190101~ 
+NM1*IL*1*Doe*John****34*111223333~ 
+PER*IP**TE*5555551212*EM*jj@yopmail.com~ 
+N3*998 W Fourth St~ 
+N4*City*AK*99999**CY*55555~ 
+DMG*D8*19800101*M*M*:RET:2106-3*1~ 
+HLH*N~ 
+LUI*LD*eng**6 
+LUI*LD*eng**7 
+NM1*31*1~ 
+N3*998 W Fourth St~ 
+ 
+ 
+ 
+ 
+ 
+ 
+BGN06 Initial enrollment transaction 
+ 
+ 
+QTY DT Dependent total 
+QTY ET Employee Total (Subscribers) 
+QTY TO Total number of INS segments 
+N1 P5 Plan Sponsor Name & SSN 
+N1 IN Insurer Name & Tax ID 
+ 
+ 
+INS03 = 021 Add, INS04 28 = Effectuated 
+REF 0F Exchange Assigned Subscriber ID 
+REF 1L mandatory for 2000 & 2300 
+REF 17 Exchange Assigned Member ID 
+REF 23 Issuer assigned member ID  
+REF ZZ Issuer assigned subscriber ID 
+REF 6O Payment Transaction ID 
+REF 4A Enrollee ID – Do not send  
+DTP 303 Issuer generated effective date 
+ 
+NM1 Member Name 
+ 
+ 
+ 
+ 
+HLH Tobacco Use 
+ 
+ 
+ 
+ 
+
+--- PAGE 80 ---
+© GetInsured 2023 All Rights Reserved.         80 
+Usage EDI Additional description of mandatory segment 
+O 
+O 
+O 
+O 
+O 
+M 
+M 
+O 
+M 
+M 
+O 
+O 
+O 
+M 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+O 
+M 
+M 
+M 
+M 
+N4*Reno*NV*89501~ 
+NM1*QD*1*Doe*John****34*111223333~ 
+PER*RP**TE*5555551212~ 
+N3*998 W Fourth St~ 
+N4*City*AK*99999~ 
+HD*021**HLT~ 
+DTP*348*D8*20190101~ 
+DTP*349*D8*20191231~ 
+DTP*543*D8*20190521~ 
+REF*1L*234~ 
+REF*CE*44442AK001000206~ 
+REF*ZZ*535~ 
+REF*X9*U99999558~ 
+LS*2700~ 
+LX*1~ 
+N1*75*APTC AMT~ 
+REF*9V*200.00~ 
+DTP*007*D8*20190101~ 
+LX*2~ 
+N1*75*CSR AMT~ 
+REF*9V*30.50~ 
+DTP*007*D8*20190101~ 
+LX*3~ 
+N1*75*PRE AMT 1~ 
+REF*9X*230.50~ 
+DTP*007*D8*20190101~ 
+LX*4~ 
+N1*75*RATING AREA~ 
+REF*9X*R-AK001~ 
+DTP*007*D8*20190101~ 
+LX*5~ 
+N1*75*TOT RES AMT~ 
+REF*9V*700.00~ 
+DTP*007*D8*20190101~ 
+LX*6~ 
+N1*75*PRE AMT TOT~ 
+REF*9X*1000.00~ 
+DTP*007*D8*20190101~ 
+LX*7~ 
+N1*75*SEP~ 
+REF*17*90-Qualifying Life Event~ 
+DTP*007*D8*20190412~ 
+LX*8~ 
+N1*75*REQUEST SUBMIT TIMESTAMP~ 
+REF*17*2019041212152133~ 
+DTP*007*D8*20190412~ 
+ 
+Optional QD is the responsible party followed 
+by the contact details for the responsible 
+person. 
+ 
+2300 HD loop is mandatory 
+DTP 348 Benefit Begin Date 
+ 
+DTP 543 Issuer Last Premium Paid Date 
+REF 1L mandatory for 2000 & 2300 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+2750 loop Request Submit Timestamp  
+Either 14 or 16 digit value is acceptable 
+ 
+
+--- PAGE 81 ---
+© GetInsured 2023 All Rights Reserved.         81 
+Usage EDI Additional description of mandatory segment 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+LX*9~ 
+N1*75*SOURCE EXCHANGE ID~ 
+REF*17*AK0~ 
+DTP*007*D8*20190521~ 
+LX*10~ 
+N1*75*ADDL MAINT REASON~ 
+REF*17*CONFIRM~ 
+DTP*007*D8*20190521~ 
+LE*2700~ 
+SE*78*000000001~ 
+GE*1*191410004~ 
+IEA*1*191410004~ 
+ 
+2750 loop Source Exchange ID 
+ 
+ 
+ 
+2750 loop Additional Maintenance Reason 
+2750 loop REF 17 = CONFIRM 
+ 
+12.3. Issuer Cancellation Supplemental Instructions 
+QHP Issuers will only send a cancellation transaction when the premium payment was not received in a 
+timely manner according to grace period policies for individual enrollments. A cancellation from the QHP 
+Issuer will result in all members on the enrollment to be cancelled.  
+ 
+12.3.1. Inbound Cancellation Segments 
+Following the CMS standard companion guide, the cancellation file must contain all the relevant data 
+segments from the initial enrollment file in addition to the segments outlined below: 
+Table 24. Inbound Cancellation Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+Header BGN Beginning 
+Segment 
+  Must be present 
+ BGN08 Action Code 2 Change (Update) Must be ‘2’ 
+Header QTY Transaction Set 
+Control Totals 
+ 
+If the transaction set control 
+totals sent with the Initial 
+Enrollment transaction are 
+not accurate for this 
+confirmation / effectuation, 
+transmit accurate totals 
+instead of the values 
+ 
+
+--- PAGE 82 ---
+© GetInsured 2023 All Rights Reserved.         82 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+received in the Initial 
+Enrollment transaction 
+ QTY01 Quantity 
+Qualifier 
+TO 
+Total. Will transmit to 
+indicate that the value 
+conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set. It is required for 
+all transactions. 
+Must be present 
+DT 
+Dependent Total. Will 
+transmit to indicate that the 
+value conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set with INS01 = “N”. 
+It is required for all 
+transactions. 
+Must be present 
+ET 
+Employee Total. Will 
+transmit to indicate that the 
+value conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set with INS01 = “Y”. 
+The Exchange requires all 
+three be sent. 
+Must be present 
+1000A N1 Sponsor Name P5 Plan Sponsor Must be present 
+1000A N1 Payer IN Insurer Must be present 
+2000 INS Member Level 
+Detail 
+  Must be present 
+ INS01 Subscriber 
+Identifier 
+Y Subscriber loop is required 
+for Cancellation.  
+N Non-subscriber member 
+loop is optional because the  
+
+--- PAGE 83 ---
+© GetInsured 2023 All Rights Reserved.         83 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+Exchange treats cancellation 
+at Subscriber level 
+ INS03 Maintenance 
+Type Code 024 Cancellation or Termination Must be ‘024’ 
+ INS04 Maintenance 
+Reason Code 59 
+This is a required field and 
+Issuers must transmit “59” 
+value because the only valid 
+reason for cancellation is 
+non-payment of premium. 
+Important Note: The 
+Exchange will reject the 
+transaction if any other 
+code is sent in this field. 
+ 
+ INS08 Employment 
+Status Code TE 
+The Exchange will send “TE” 
+for cancellation and 
+termination transactions 
+Must be ‘TE’ 
+2000 REF Subscriber 
+Identifier 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number Must be present 
+ REF02 Subscriber 
+Identifier 
+ 
+The Exchange Assigned ID of 
+the primary coverage 
+person 
+Must be 10 
+numeric characters 
+2000 REF Member Policy 
+Number 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L 
+When the Exchange 
+Assigned Policy ID is 
+conveyed in REF02. Policy ID 
+is mandatory in both 2000 
+and 2300 loops 
+Must be present 
+
+--- PAGE 84 ---
+© GetInsured 2023 All Rights Reserved.         84 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ REF02 
+Member Group 
+or Policy 
+Number 
+ 
+Policy ID (Enrollment ID), is 
+the unique identifier for an 
+enrollment. 
+Important Note: Since this is 
+the unique Identifier for an 
+enrollment in the Exchange 
+system, Issuers are required 
+to send back in all the 834 
+transactions. 
+ 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown 
+below when they were 
+present on the Initial 
+Enrollment 
+ 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member 
+ID sent in REF02 
+Must be 10 
+numeric characters 
+23 Issuer Assigned Member ID 
+sent in REF02 
+Highly 
+recommended 
+ZZ Issuer Assigned Subscriber 
+ID sent in REF02 
+Highly 
+recommended 
+2000 DTP Member Level 
+Dates 
+   
+ DTP01 Date Time 
+Qualifier 
+303 Maintenance Effective Must be present 
+357 Eligibility End Date Must be present 
+ DTP03 
+Status 
+Information 
+Effective Date 
+ 
+The eligibility end date 
+represents the last date of 
+coverage for which claims 
+will be paid for the 
+individual being terminated. 
+For example, if a date of 
+03/31/2022 is passed, then 
+claims for this individual will 
+be paid through 11:59 p.m. 
+on 03/31/2022. 
+ 
+
+--- PAGE 85 ---
+© GetInsured 2023 All Rights Reserved.         85 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+The eligibility end date of 
+the cancellation must be 
+transmitted, and must 
+match the benefit begin 
+date sent on the Initial 
+Enrollment  
+2100A NM1 Member Name IL Insured or Subscriber Must be present 
+2300 HD Health Coverage   Must be present 
+ HD01 Maintenance 
+Type Code 
+024 Cancellation or Termination Must be ‘024’ 
+ HD03 Insurance Line 
+Code 
+DEN Dental  
+HLT  Health  
+2300 DTP Health Coverage 
+Dates    
+ 
+DTP01 
+ 
+Date Time 
+Qualifier 
+ 
+348 
+Enrollment Period Start 
+Date 
+Important Note: For all 
+cancellation transactions, 
+Issuers are required to send 
+the start date equal to the 
+end date. Also, note that the 
+Exchange will treat 
+cancellation at Subscriber 
+Level. 
+Must be present 
+349 
+Enrollment Period End Date 
+Important Note: For all 
+cancellation transactions, 
+Issuers are required to send 
+the start date equal to the 
+end date. Also, note that the 
+Exchange will treat 
+cancellation at Subscriber 
+Level. 
+If not present, the 
+2000 DTP*357 is 
+used to populate 
+the Enrollment 
+Period End Date 
+
+--- PAGE 86 ---
+© GetInsured 2023 All Rights Reserved.         86 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+2300 REF Health Coverage 
+Policy Number 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L 
+Policy ID (Enrollment ID), 
+which is the unique 
+identifier for an enrollment, 
+should be passed in this 
+field. Policy ID is mandatory 
+in both 2000 and 2300 loops 
+Important Note: Since this is 
+the unique Identifier for an 
+enrollment in the Exchange 
+system, Issuers are required 
+to send back in all the 834 
+transactions. 
+Must be present 
+2000 LS 
+Additional 
+Reporting 
+Categories 
+  Must be present 
+ LS01 Loop Identifier 
+Code 2700  Must be ‘2700’ 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is 
+required for all 
+cancellations. See Section 
+9.6 of the CMS Standard 
+Companion Guide 
+Transaction Version 5.0 for 
+explicit instructions related 
+to loop 2700. 
+Must be present 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 
+of the CMS Standard 
+Companion Guide 
+Transaction Version 5.0 for 
+explicit instructions related 
+to the 2750 loop 
+Must be present 
+
+--- PAGE 87 ---
+© GetInsured 2023 All Rights Reserved.         87 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ N102 
+Member 
+Reporting 
+Category Name 
+ 
+Value = “ADDL MAINT 
+REASON” 
+Must be ‘ADDL 
+MAINT REASON’ 
+2750 REF 
+Reporting 
+Category 
+Reference 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category Must be ‘17’ 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ 
+Value = “CANCEL” 
+Issuers should send 
+“CANCEL” if End Date is 
+equal to or less than the 
+Start Date. Otherwise, send 
+“TERM” in this field. 
+Must be ‘CANCEL’ 
+1 Note: where is indicated in the validation column, that data element is validated for possible 834 rejection 
+or 2nd level business validation rejection for inbound to Exchange transactions. 
+ 
+12.3.2. Inbound Cancellation Sample 
+The sample file includes segments that could be sent back in the cancel file. Not all segments are mandatory. 
+The green highlighted rows indicate mandatory elements that must be included in the file. All other 
+segments are valid, but they are not used in the cancellation for non-payment process.  
+Usage:  M – Mandatory, H/R – Highly Recommended, E – Exclude, O – Optional   
+Table 25. Inbound Cancellation Sample 
+Usage EDI Additional description of mandatory segment 
+M 
+ 
+ 
+M 
+ 
+M 
+M 
+ 
+ISA*00*          *00*          *ZZ*440344294      
+*ZZ*AK0            
+*190520*1923*^*00501*000002467*1*P*:~ 
+GS*BE*440344294*AK0*20190520*1923*2467*X
+*005010X220A1~ 
+ST*834*879232019*005010X220A1~ 
+BGN*00*879232019*20190520*192356*MT***2
+~ 
+ 
+ 
+ 
+ 
+ 
+ 
+BGN inbound cancellation transaction 
+ 
+
+--- PAGE 88 ---
+© GetInsured 2023 All Rights Reserved.         88 
+Usage EDI Additional description of mandatory segment 
+M 
+M 
+M 
+M 
+M 
+ 
+O 
+O 
+M 
+M 
+M 
+M 
+O 
+E 
+H/R 
+H/R 
+M 
+O 
+M 
+M 
+O 
+O 
+O 
+O 
+M 
+O 
+O 
+O 
+O 
+M 
+M 
+O 
+M 
+O 
+O 
+O 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+QTY*ET*1~ 
+QTY*TO*1~ 
+QTY*DT*0~ 
+N1*P5*Fred Doe*FI*237272727~ 
+N1*IN*Blue Cross Health Service, 
+Inc.*FI*844444294~ 
+N1*BO*Fred Smith*FI*123321123 
+ACT*3683790 
+INS*Y*18*024*59*A***TE~ 
+REF*0F*1000446684~ 
+REF*1L*5557335~ 
+REF*17*1000446684~ 
+REF*6O*AK00002307517~ 
+REF*4A*434343~ 
+REF*23*971089680~ 
+REF*ZZ*971089680~ 
+DTP*303*D8*20190520~ 
+DTP*356*D8*20190101~ 
+DTP*357*D8*20190101~ 
+NM1*IL*1*Doe*Fred****34*237272727~ 
+PER*IP**TE*5553331212~ 
+N3*666 N State St Apt 107~ 
+N4*City*AK*55555**CY*Ada~ 
+DMG*D8*19681125*F*R*:RET:2106-3~ 
+HLH*N~ 
+NM1*QD*1*Doe*Fred****34*237272727~ 
+PER*RP**TE*5553331212~ 
+N3*666 N State St Apt 107~ 
+N4*City*AK*55555~ 
+HD*024**HLT~ 
+DTP*348*D8*20190101~ 
+DTP*349*D8*20190101~ 
+REF*1L*5557335~ 
+REF*CE*61589AK171000101~ 
+REF*X9*X068PP-A0003~ 
+REF*ZZ*101183~ 
+LS*2700~ 
+LX*1~ 
+N1*75*REQUEST SUBMIT TIMESTAMP~ 
+REF*17*2019052002523619~ 
+DTP*007*D8*20190520~ 
+LX*2~ 
+N1*75*SOURCE EXCHANGE ID~ 
+REF*17*AK0~ 
+DTP*007*D8*20190101~ 
+LX*3~ 
+QTY ET Employee Total (Subscribers) 
+QTY TO Total number of INS segments 
+QTY DT Dependent total 
+N1 P5 Plan Sponsor Name & SSN 
+N1 IN Insurer Name & Tax ID 
+ 
+ 
+ 
+INS03 024, INS04 59 cancel non-payment 
+REF 0F Exchange Assigned Subscriber ID 
+REF 1L mandatory for 2000 & 2300 
+REF 17 Exchange Assigned Member ID 
+ 
+REF 4A Enrollee ID – Do not send  
+REF 23 Issuer assigned member ID 
+REF ZZ Issuer assigned subscriber ID 
+ 
+ 
+DTP 357 Eligibility End Date 
+NM1 Member Name 
+ 
+ 
+ 
+ 
+HLH Tobacco Use 
+ 
+ 
+ 
+ 
+HD01 024 = Cancel, 2300 HD loop is mandatory 
+DTP 348 Benefit Begin Date, Same date as DTP 349 
+REF 1L mandatory for 2000 & 2300 
+ 
+ 
+ 
+ 
+ 
+2750 loop Request Submit Timestamp  
+Either 14 or 16 digit value is acceptable 
+ 
+ 
+2750 loop Source Exchange ID 
+ 
+ 
+ 
+2750 loop Additional Maintenance Reason 
+
+--- PAGE 89 ---
+© GetInsured 2023 All Rights Reserved.         89 
+Usage EDI Additional description of mandatory segment 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+N1*75*ADDL MAINT REASON~ 
+REF*17*CANCEL~ 
+DTP*007*D8*20190520~ 
+LE*2700~ 
+SE*37*879232019~ 
+GE*1*2467~ 
+IEA*1*000002467~ 
+2750 loop REF 17 = CANCEL 
+ 
+12.4. Issuer Termination Supplemental Instructions 
+QHP Issuers will only send a termination transaction when the premium payment was not received in a 
+timely manner according to grace period policies for individual enrollments. Termination from the QHP 
+Issuer will result in all members for the enrollment to be terminated. 
+ 
+12.4.1. Inbound Termination Segments 
+Following the CMS standard companion guide, the termination file must contain all the relevant data 
+segments from the initial enrollment file in addition to the segments outlined below: 
+Table 26. Inbound Termination Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+Header BGN Beginning 
+Segment 
+  Must be present 
+ BGN08 Action Code 2 Change (Update) Must be ‘2’ 
+Header QTY Transaction Set 
+Control Totals 
+ 
+If the transaction set control 
+totals sent with the Initial 
+Enrollment transaction are 
+not accurate for this 
+confirmation / effectuation, 
+transmit accurate totals 
+instead of the values 
+received in the Initial 
+Enrollment transaction 
+ 
+
+--- PAGE 90 ---
+© GetInsured 2023 All Rights Reserved.         90 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ QTY01 Quantity 
+Qualifier 
+TO 
+Total. Will transmit to 
+indicate that the value 
+conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set. It is required for 
+all transactions. 
+Must be present 
+DT 
+Dependent Total. Will 
+transmit to indicate that the 
+value conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set with INS01 = “N”. 
+It is required for all 
+transactions. 
+Must be present 
+ET 
+Employee Total. Will 
+transmit to indicate that the 
+value conveyed in QTY02 
+represents the total number 
+of INS segments in this 
+ST/SE set with INS01 = “Y”. 
+The Exchange requires all 
+three be sent. 
+Must be present 
+1000A N1 Sponsor Name P5 Plan Sponsor Must be present 
+1000A N1 Payer IN Insurer Must be present 
+2000 INS Member Level 
+Detail 
+   
+ INS01 Subscriber 
+Identifier 
+Y Subscriber loop is required 
+for termination    
+N 
+Non-subscriber member 
+loop is optional because the 
+Exchange processes 
+cancellation at Subscriber 
+level 
+ 
+
+--- PAGE 91 ---
+© GetInsured 2023 All Rights Reserved.         91 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ INS03 Maintenance 
+Type Code 024 Cancellation or Termination Must be ‘024’ 
+ INS04 Maintenance 
+Reason Code 59 
+This is a required field and 
+Issuers must transmit “59” 
+value because the only valid 
+reason for termination is 
+non-payment of premium.  
+Important Note: The 
+Exchange will reject the 
+transaction if any other 
+code is sent in this field. 
+ 
+ INS08 Employment 
+Status Code TE 
+The Exchange will send “TE” 
+for cancellation and 
+termination transactions 
+Must be ‘TE’ 
+2000 REF Subscriber 
+Identifier 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Subscriber Number Must be present 
+ REF02 Subscriber 
+Identifier 
+ 
+The Exchange Assigned ID of 
+the subscriber 
+Must be 10 
+numeric characters 
+2000 REF Member Policy 
+Number 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L 
+When the Exchange 
+Assigned Policy ID is 
+conveyed in REF02. Policy ID 
+is mandatory in both 2000 
+and 2300 loops 
+Must be present 
+ REF02 
+Member Group 
+or Policy 
+Number 
+ 
+Issuers should transmit 
+Policy ID (Enrollment ID), 
+which is the unique 
+identifier for an enrollment 
+in the Exchange System. 
+ 
+
+--- PAGE 92 ---
+© GetInsured 2023 All Rights Reserved.         92 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+Important Note: Since this is 
+the unique Identifier for an 
+enrollment in the Exchange 
+system, Issuers are required 
+to store this ID in their 
+system and send back in all 
+the 834 transactions. 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+ 
+Transmit the IDs shown 
+below when they were 
+present on the Initial 
+Enrollment 
+ 
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member 
+ID is sent in REF02 
+Must be 10 
+numeric characters 
+23 Issuer Assigned Member ID 
+is sent in REF02 
+Highly 
+recommended 
+ZZ Issuer Assigned Subscriber 
+ID is sent in REF02 
+Highly 
+recommended 
+2000 DTP Member Level 
+Dates 
+   
+ DTP01 Date Time 
+Qualifier 
+303 Maintenance Effective Must be present 
+357 Eligibility End Date Must be present 
+ DTP03 
+Status 
+Information 
+Effective Date 
+ 
+The eligibility end date 
+represents the last date of 
+coverage for which claims 
+will be paid for the 
+individual being terminated. 
+For example, if a date of 
+03/31/2022 is passed, then 
+claims for this individual will 
+be paid through 11:59 p.m. 
+on 03/31/2022. 
+ 
+
+--- PAGE 93 ---
+© GetInsured 2023 All Rights Reserved.         93 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+The eligibility end date of 
+the termination must be 
+transmitted 
+2100A NM1 Member Name IL Insured or Subscriber Must be present 
+2300 HD Health Coverage   Must be present 
+ HD01 Maintenance 
+Type Code 
+024 Cancellation or Termination Must be ‘024’ 
+ HD03 Insurance Line 
+Code 
+DEN Dental  
+HLT  Health  
+2300 DTP Health Coverage 
+Dates  
+Both 348/349 dates are 
+required. 343 is strongly 
+recommended. 
+Important Note: Issuers are 
+required to send the same 
+termination dates for all the 
+members. The Exchange 
+treats termination at 
+Subscriber level and will use 
+the Subscriber’s termination 
+date as the end date for the 
+rest of the members. 
+ 
+ DTP01 Coverage Period 
+343 Premium Paid to Date End – 
+strongly recommended  
+348 Enrollment Period Start 
+Date – required Must be present 
+349 
+Enrollment Period End Date 
+– required for terms 
+If APTC consumed, DTP*349 
+termination date must allow 
+for grace period after 
+DTP*343 last paid through 
+end date. 
+If not present, the 
+2000 DTP*357 is 
+used to populate 
+the Enrollment 
+Period End Date 
+
+--- PAGE 94 ---
+© GetInsured 2023 All Rights Reserved.         94 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+2300 REF Health Coverage 
+Policy Number 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L 
+ 
+Issuers should transmit 
+Policy ID (Enrollment ID), 
+which is the unique 
+identifier for an enrollment 
+in the Exchange System. 
+Policy ID is mandatory in 
+both 2000 and 2300 loops 
+ 
+Important Note: Since this is 
+the unique Identifier for an 
+enrollment in the Exchange 
+system, Issuers are required 
+to store this ID in their 
+system and send back in all 
+the 834 transactions. 
+Must be present 
+2000 LS 
+Additional 
+Reporting 
+Categories 
+  Must be present 
+ LS01 Loop Identifier 
+Code 2700  Must be ‘2700’ 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is 
+required for all 
+terminations. See Section 
+9.6 of the CMS Standard 
+Companion Guide 
+Transaction Version 5.0 for 
+explicit instructions related 
+to loop 2700. 
+Must be present 
+2750 N1 Reporting 
+Category 
+ 
+See Sections 9.6.1 and 9.6.2 
+for explicit instructions 
+related to the 2750 loop 
+Must be present 
+
+--- PAGE 95 ---
+© GetInsured 2023 All Rights Reserved.         95 
+Table or Loop Element Industry / 
+Element Name Code Instruction Validation1 
+ N102 
+Member 
+Reporting 
+Category Name 
+ 
+Value = “ADDL MAINT 
+REASON” 
+Must be ‘ADDL 
+MAINT REASON’ 
+2750 REF 
+Reporting 
+Category 
+Reference 
+   
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category Must be ‘17’ 
+ REF02 
+Member 
+Reporting 
+Category 
+Reference ID 
+ 
+Value = “TERM” 
+Issuers should send 
+“CANCEL” if End Date is 
+equal to or less than the 
+Start Date. Otherwise, send 
+“TERM” in this field. 
+Must be ‘TERM’ 
+1 Note: where is indicated in the validation column, that data element is validated for possible 834 rejection 
+or 2nd level business validation rejection for inbound to Exchange transactions. 
+ 
+12.4.2. Inbound Termination Sample 
+The sample file includes segments that could be sent back in the termination file. Not all segments are 
+mandatory. The green highlighted rows indicate mandatory elements that must be included in the file. All 
+other segments are valid, but they are not used in the termination for non-payment process. The yellow 
+highlighted rows indicate elements that are strongly advised to be sent as they can impact reconciliation. 
+Usage:  M – Mandatory, H/R – Highly Recommended, E – Exclude, O – Optional   
+Table 27. Inbound Termination Sample 
+Usage EDI Additional description of mandatory segment 
+M 
+ 
+ 
+M 
+ 
+M 
+ISA*00*          *00*          *ZZ*440344294      
+*ZZ*AK0            
+*190520*1923*^*00501*000002467*1*P*:~ 
+GS*BE*440344294*AK0*20190520*1923*2467*X
+*005010X220A1~ 
+ST*834*879232019*005010X220A1~ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 96 ---
+© GetInsured 2023 All Rights Reserved.         96 
+Usage EDI Additional description of mandatory segment 
+M 
+ 
+M 
+M 
+M 
+M 
+M 
+ 
+O 
+O 
+M 
+M 
+M 
+M 
+O 
+E 
+H/R 
+H/R 
+M 
+O 
+M 
+M 
+O 
+O 
+O 
+O 
+M 
+O 
+O 
+O 
+O 
+M 
+M 
+O 
+H/R 
+O 
+M 
+O 
+O 
+O 
+M 
+M 
+M 
+M 
+M 
+M 
+BGN*00*879232019*20190520*192356*MT***2
+~ 
+QTY*ET*1~ 
+QTY*TO*1~ 
+QTY*DT*0~ 
+N1*P5*Cindy Doe*FI*537777777~ 
+N1*IN*Blue Cross Health Service, 
+Inc.*FI*844444294~ 
+N1*BO*Fred Smith*FI*123321123 
+ACT*3683790 
+INS*Y*18*024*59*A***TE~ 
+REF*0F*1000806685~ 
+REF*1L*5557555~ 
+REF*17*1000806685~ 
+REF*6O*AK00002307517~ 
+REF*4A*434343~ 
+REF*23*975559680~ 
+REF*ZZ*975559680~ 
+DTP*303*D8*20190520~ 
+DTP*356*D8*20190101~ 
+DTP*357*D8*20190331~ 
+NM1*IL*1*Doe*Cindy****34*537777777~ 
+PER*IP**TE*2088908871~ 
+N3*12 N Front St Apt 727~ 
+N4*City*AK*55555**CY*Ada~ 
+DMG*D8*19681125*F*R*:RET:2106-3~ 
+HLH*N~ 
+NM1*QD*1*Doe*Sally****34*537777777~ 
+PER*RP**TE*2088908888~ 
+N3*12 N Front St Apt 727~ 
+N4*City*AK*55555~ 
+HD*024**HLT~ 
+DTP*348*D8*20190101~ 
+DTP*349*D8*20190331~ 
+DTP*343*D8*20190228~ 
+DTP*543*D8*20190108~ 
+REF*1L*5557555~ 
+REF*CE*22282AK171000101~ 
+REF*X9*X012ZZ-0012~ 
+REF*ZZ*101183~ 
+LS*2700~ 
+LX*1~ 
+N1*75*REQUEST SUBMIT TIMESTAMP~ 
+REF*17*2018102402523604~ 
+DTP*007*D8*20181024~ 
+LX*2~ 
+BGN06 Inbound termination transaction 
+ 
+QTY ET Employee Total (Subscribers) 
+QTY TO Total number of INS segments 
+QTY DT Dependent total 
+N1 P5 Plan Sponsor Name & SSN 
+N1 IN Insurer Name & Tax ID 
+ 
+ 
+ 
+INS03 024, INS04 59 term non-payment 
+REF 0F Exchange Assigned Subscriber ID 
+REF 1L mandatory for 2000 & 2300 
+REF 17 Exchange Assigned Member ID 
+ 
+REF 4A Enrollee ID – Do not send  
+REF 23 Issuer assigned member ID 
+REF ZZ Issuer assigned subscriber ID 
+ 
+ 
+DTP 357 Eligibility End Date1 
+NM1 Member Name 
+ 
+ 
+ 
+ 
+HLH Tobacco Use 
+ 
+ 
+ 
+ 
+HD01 024 = Term, 2300 HD loop is mandatory 
+DTP 348 Benefit Start Date 
+DTP 349 Benefit End Date1 
+DTP 343 Premium Paid to Date End2 
+ 
+REF 1L mandatory for 2000 & 2300 
+ 
+ 
+ 
+ 
+ 
+2750 loop Request Submit Timestamp  
+Either 14 or 16 digit value is acceptable 
+ 
+ 
+
+--- PAGE 97 ---
+© GetInsured 2023 All Rights Reserved.         97 
+Usage EDI Additional description of mandatory segment 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+M 
+N1*75*SOURCE EXCHANGE ID~ 
+REF*17*AK0~ 
+DTP*007*D8*20190101~ 
+LX*3~ 
+N1*75*ADDL MAINT REASON~ 
+REF*17*TERM~ 
+DTP*007*D8*20190520~ 
+LE*2700~ 
+SE*57*879232019~ 
+GE*1*2467~ 
+IEA*1*000002467~ 
+2750 loop Source Exchange ID 
+ 
+ 
+ 
+2750 loop Additional Maintenance Reason 
+2750 loop REF 17 = TERM 
+1 If APTC consumed, DTP*357 eligibility end date and if present, the DTP*349 termination date must allow 
+for grace period after DTP*343 last paid through end date. 
+2 If APTC not eligible or not consumed, DTP*343 last paid through end date equals DTP*357 eligibility end 
+date and if present, the DTP*349 termination date, no grace period applies. The example above reflects 
+APTC consumed scenario. 
+12.5. Other Transactions 
+Issuers should not send transactions other than Confirmation, Termination for non-payment (INS04 59), or 
+Cancellation for non-payment (INS04 59). The Exchange will not accept the following INS03 values and 
+sending these will result in an error. 
+● 001 – Change 
+● 002 – Delete 
+● 025 – Reinstatement  
+● 026 – Correction 
+● 030 – Audit 
+● 032 – Employee Information Not Applicable 
+  
+
+--- PAGE 98 ---
+© GetInsured 2023 All Rights Reserved.         98 
+13. Annual Renewals 
+The following subsections outline the annual renewal processing used in the Individual market.  
+13.1. Individual Market 
+Auto-renewals (also known as Passive renewal) for the Individual market will be a one-time activity, 
+scheduled to be done before the start of the Open Enrollment Period. The 2750 loop additional 
+maintenance reason codes sent by the Exchange differ from CMS. 
+ 
+13.1.1. End of Coverage Year Terms 
+End of Coverage Year (EOY) termination batch job options are revised for year ending 2023 onwards. 
+● Exchange determines if Issuers receive EOY term 834 transactions and when to run the batch job to 
+generate the terminations. Options are: All current year enrollments, or only enrollments which 
+were not successfully auto renewed, or only manual enrollment to a different Issuer, during Open 
+Enrollment Period, or the default process to not generate EOY term 834 transactions. 
+● If EOY terms are generated, the Exchange determines if Issuers receive EOY term transactions for 
+auto-renewals in a separate file. 
+o For enrollments not created by the auto-renewal process, the EOY terminations for those 
+enrollments are sent in the daily 834 file. 
+o For enrollments created by the auto-renewal process, the EOY terminations will include a ‘RENP’ 
+indicator in the 2750 loop member reporting category section and are sent in a separate 834 file 
+with the following file naming convention:   
+to_<HIOS ID>_ID_834_INDV_RENTERM_<CCYYMMDDHHMMSS>.edi 
+ 
+13.1.2. Auto Renewal ‘RENP’ Adds 
+● The Exchange will auto-effectuate enrollments that are successfully auto-renewed, provided that 
+the consumer’s current year enrollment is with the same Issuer and is already effectuated by the 
+Issuer. In other words, if the previous year enrollment was in pending status, then 
+confirmation/effectuation required for the next coverage year renewal enrollment. 
+● For auto-renewal Add transactions, the Exchange will contain a ‘RENP’ indicator in the 2750 loop 
+member reporting category section.  
+● Revised for 2024 enrollments, configurable by state, the auto-renewal Add transactions will 
+appear in a separate file from the normal daily 834 file with both the auto-renewal and daily files 
+following the file naming convention (same format as daily 834 file): 
+to_<HIOS ID>_ID_834_INDV_<CCYYMMDDHHMMSS>.edi 
+
+--- PAGE 99 ---
+© GetInsured 2023 All Rights Reserved.         99 
+Note: The Exchange will not auto-effectuate enrollment if the current year enrollment is in pending state in 
+the Exchange System.  
+ 
+13.1.3. Cross Issuer Renewals 
+As part of Cross Issuer Renewal, the Exchange will send an Add transaction to the new Issuer. The Add 
+transaction will not contain any auto-renewal ‘RENP’ indicator. The Add transaction will appear in the same 
+file as usual (non-renewal) 834s. End of Coverage Year Termination transaction are separate from the Add 
+transaction. Refer to Section 13.1.1. 
+ 
+13.1.4. Terminations for Current Coverage Year Enrollments 
+If the Exchange has elected to send EOY terminations, the Exchange will send current coverage year 
+enrollment terminations with INS03 = 024 and INS04 = 07 codes. Issuers are expected to only send back 
+TA1/999 acknowledgement for these term transactions. The table below highlights the key data elements 
+that will be sent in the 834 transaction. For more information on End of Coverage Year Terminations, refer 
+to Section 13.1.1 
+Table 28. End of Coverage Year Terminations Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 024 The Exchange will send “024” to indicate either 
+Cancellation or Termination 
+ INS04 Maintenance 
+Reason Code 07 The Exchange will send “07” to indicate reason 
+as Termination of Benefits 
+ INS08 Employment 
+Status Code TE The Exchange will send “TE” for cancellation 
+and termination transactions 
+2000 REF Subscriber 
+Identifier 
+  
+ REF01 Reference ID 
+Qualifier 0F Exchange Assigned Subscriber ID 
+ REF02 Subscriber 
+Identifier 
+ 
+The Exchange will send the same Exchange 
+Assigned Subscriber ID that was sent earlier in 
+the initial Enrollment transaction 
+
+--- PAGE 100 ---
+© GetInsured 2023 All Rights Reserved.         100 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member ID 
+  REF02 
+Member 
+Supplemental 
+Identifier 
+ 
+The Exchange will send the same Exchange 
+Assigned Member ID that was sent earlier in 
+the initial Enrollment transaction 
+2000 REF Member Policy 
+Number 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L Exchange Assigned Policy ID 
+ REF02 Member Policy 
+Number 
+ 
+The Exchange will send the same Exchange 
+Assigned Policy ID that was sent earlier in the 
+initial Enrollment transaction 
+2000 DTP Member Level 
+Dates 
+  
+ DTP01 Date / Time 
+Qualifier 357 Eligibility End Date 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period 
+ 
+357: The Exchange will send 12/31 of current 
+coverage year 
+2300 HD Health Coverage   
+ HD01 Maintenance 
+Type Code 024 The Exchange will send “024” to indicate either 
+Cancellation or Termination 
+
+--- PAGE 101 ---
+© GetInsured 2023 All Rights Reserved.         101 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ HD02 Maintenance 
+Reason Code 
+ 
+This field is inactive. The Exchange will never 
+send this field.  
+2300 DTP Health Coverage 
+Dates 
+ Both dates will be sent 
+ DTP01 Date / Time 
+Qualifier 
+348 Enrollment Period Begin Date 
+349 
+ 
+Enrollment Period End Date– represents the 
+last date of coverage in which claims will be 
+paid for the individual being terminated. 
+Note: Differs from CMS, as they do not send. 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period 
+ 
+348: The Exchange will send the coverage start 
+date of the policy 
+349: The Exchange will send 12/31 of current 
+coverage year 
+2300 REF Health Coverage 
+Policy Number 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+CE 
+ 
+QHP ID Purchased is the Assigned Plan 
+Identifier (standard component identifier) plus 
+the Variation Component. (HIOS ID) 
+1L 
+ 
+Exchange Assigned Policy ID. 
+Important Note: Since this is the unique 
+Identifier for an enrollment in the Exchange 
+system, Issuers are required to store this ID in 
+their system and send back in all the 834 
+transactions. 
+ZZ 
+Will transmit with the Client ID (HouseHold 
+Case ID). In the case of custom grouping 
+(multiple health enrollments for the same 
+household), the Client ID is the same for each 
+enrollment. 
+
+--- PAGE 102 ---
+© GetInsured 2023 All Rights Reserved.         102 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2700 LX 
+Member 
+Reporting 
+Categories Loop 
+ 
+One iteration of this loop is required for all 
+terminations. See Section 9.6 of the CMS 
+Standard Companion Guide Transaction 
+Version 5.0 for explicit instructions related to 
+loop 2700. 
+2750 N1 Reporting 
+Category 
+  
+ N101 Entity Identifier 
+Code 75 Participant 
+ N102 Free-form name  
+The Exchange will send value “RENP” to 
+indicate that the terminated enrollment was 
+auto-renewed. This field will not be sent for 
+regular terminations or cancellation 
+transactions caused by non-renewal processing. 
+(differs from CMS) 
+Note: For more information on End of Coverage 
+Year Terminations, refer to Section 13.1.1  
+ REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 Reference 
+Identification 
+ 
+The Exchange will send value “RENP” to 
+indicate that the terminated enrollment was 
+auto-renewed. This field will not be sent for 
+regular terminations or cancellation 
+transactions caused by non-renewal processing. 
+ DTP Reporting 
+Category Date 
+  
+ DTP01 Date / Time 
+Qualifier 007 Effective 
+
+--- PAGE 103 ---
+© GetInsured 2023 All Rights Reserved.         103 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period 
+ 
+007: The Exchange will send same date value 
+that is used for Request Submit Timestamp 
+2750 N1 Reporting 
+Category 
+  
+ N101 Entity Identifier 
+Code 75 Participant 
+ N102 Free-form name  
+The Exchange will send value “ADDL MAINT 
+REASON.” 
+ REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 Reference 
+Identification 
+ The Exchange will send value “TERM.” 
+ DTP Reporting 
+Category Date 
+  
+ DTP01 Date / Time 
+Qualifier 007 Effective 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period  007: The Exchange will send same date value 
+that is used for Request Submit Timestamp 
+ 
+
+--- PAGE 104 ---
+© GetInsured 2023 All Rights Reserved.         104 
+13.1.5. Passive Renewal (Auto Renewal) for Next Coverage Year 
+The Exchange will send the additional 834s for enrollments that are eligible for auto-renewal for next 
+coverage year. The table below highlights the key data elements that will be sent in the 834 transaction. To 
+help Issuers identify these as renewal additions, the Exchange will send “RENP” and “AUTORENEW” 
+indicators in the 2750 reporting loop. 
+Please note: Configurable by state, these renewal addition transactions will be sent in a separate 834 file 
+from the daily 834 file containing the regular 834 transactions.  
+Please note: The renewal Add transactions will contain the same segments as defined in Section 11.1 of this 
+guide, except as highlighted in the table below: 
+Table 29. Passive Renewal Supplemental Instructions 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+2000 INS Member Level 
+Detail 
+  
+ INS03 Maintenance 
+Type Code 021 The Exchange will send “021” to indicate 
+Addition 
+ INS04 Maintenance 
+Reason Code 41 The Exchange will send “41” to indicate reason 
+as Reenrollment to the same Issuer 
+2000 REF Subscriber 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+0F Exchange Assigned Subscriber ID 
+ REF02 Subscriber 
+Identifier 
+ 
+The Exchange will retain and send the same 
+Exchange Assigned Subscriber ID that was sent 
+earlier in the previous coverage year 
+Enrollment transaction 
+2000 REF 
+Member 
+Supplemental 
+Identifier 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Exchange Assigned Member ID 
+
+--- PAGE 105 ---
+© GetInsured 2023 All Rights Reserved.         105 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ REF02 
+Member 
+Supplemental 
+Identifier 
+ 
+The Exchange will retain and send the same 
+Exchange Assigned Member ID that was sent 
+earlier in the previous coverage year 
+Enrollment transaction 
+2000 REF Member Policy 
+Number 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+1L Exchange Assigned Policy ID 
+ REF02 Member Policy 
+Number 
+ 
+The Exchange will generate and send a new 
+Exchange Assigned Policy ID. The Issuers are 
+expected to treat this as new initial enrollment 
+and send back confirmations for this new Policy 
+ID. 
+Note: The Exchange tracks current coverage 
+year and next coverage year enrollments as 
+two separate policies with different Exchange 
+Assigned Policy IDs. Making a change to one 
+enrollment will not affect the other. Issuers 
+intending to cancel or terminate both 
+enrollments are expected to send separate 834 
+transactions with the respective Exchange 
+Assigned Policy ID. Also, consumers will be 
+instructed to report changes on these 
+enrollments separately. 
+2300 HD Health Coverage   
+ HD01 Maintenance 
+Type Code 021 The Exchange will send “021” to indicate 
+Addition 
+ HD02 Maintenance 
+Reason Code 
+ 
+This field is inactive. The Exchange will never 
+send this field 
+2300 DTP Health Coverage 
+Dates 
+  
+
+--- PAGE 106 ---
+© GetInsured 2023 All Rights Reserved.         106 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ DTP01 Date / Time 
+Qualifier 348 Enrollment Period Begin Date 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period 
+ 
+348: The Exchange will send 1/1 of next 
+coverage year 
+2300 DTP Health Coverage 
+Dates 
+  
+ DTP01 Date / Time 
+Qualifier 349 Enrollment Period End Date 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period 
+ 
+349: The Exchange will send 12/31 of next 
+coverage year 
+2750 N1 Reporting 
+Category 
+  
+ N101 Entity Identifier 
+Code 75 Participant 
+ N102 Free-form name  The Exchange will send value “RENP.” 
+ REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 Reference 
+Identification 
+ The Exchange will send value “RENP.” 
+
+--- PAGE 107 ---
+© GetInsured 2023 All Rights Reserved.         107 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ DTP Reporting 
+Category Date 
+  
+ DTP01 Date / Time 
+Qualifier 007 Effective 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+ DTP03 Date Time 
+Period 
+ 
+007: The Exchange will send same date value 
+that is used for Request Submit Timestamp 
+2750 N1 Reporting 
+Category 
+  
+ N101 Entity Identifier 
+Code 75 Participant 
+ N102 Free-form name  
+The Exchange will send value “ADDL MAINT 
+REASON.” 
+ REF 
+Reporting 
+Category 
+Reference 
+  
+ REF01 
+Reference 
+Identification 
+Qualifier 
+17 Client Reporting Category 
+ REF02 Reference 
+Identification 
+ 
+The Exchange will send value “AUTORENEW.” 
+(differs from CMS) 
+ DTP Reporting 
+Category Date 
+  
+ DTP01 Date / Time 
+Qualifier 007 Effective 
+ DTP02 
+Date Time 
+Period Format 
+Qualifier 
+D8 Date Expressed in Format CCYYMMDD 
+
+--- PAGE 108 ---
+© GetInsured 2023 All Rights Reserved.         108 
+Table or Loop Element Industry / 
+Element Name Code Instruction 
+ DTP03 Date Time 
+Period 
+ 
+007: The Exchange will send same date value 
+that is used for Request Submit Timestamp 
+ 
+ 
+13.1.6. Renewal Exceptions 
+The Exchange will not automatically term the next coverage year for cases where the current year is termed 
+after renewal transaction is sent to the Issuer. The Exchange handles termination of current year and next 
+coverage year enrollments separately. The consumer is required to cancel the renewal. Note:  Issuers could 
+receive a renewal transaction for the next coverage year with the current year terminated if the consumer 
+does not take action. 
+The Exchange will not send renewal Add transactions for next coverage year for cases that are not auto-
+renewed either due to consumer's ineligibility for auto-renewal or due to exceptions. These cases will be 
+manually enrolled for next coverage year by the consumer or the broker during the Open Enrollment Period. 
+These manually processed Add transactions will appear as regular initial enrollment 834 transactions 
+(021*EC) without 2750 loop ‘RENP’ and ‘AUTORENEW’ indicators. Please note: The Exchange will not track 
+these enrollments as manual (active) renewals and they will be recorded in the system as initial enrollment.  
+Addition of a new member to the household for next year coverage during Open Enrollment Period is 
+treated as an Add transaction that will appear as regular initial enrollment 834 transaction (021*EC) without 
+2750 loop ‘RENP’ and ‘AUTORENEW’ indicators. 
+Note: The Exchange will not auto-effectuate initial enrollment transaction (021*EC), and Issuers are 
+expected to send confirmation transactions. Initial enrollments do not contain the ‘RENP’ indicator in the 
+2750 loop. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 109 ---
+© GetInsured 2023 All Rights Reserved.         109 
+13.2. Renewed Enrollment Status 
+The renewed enrollment status will be inherited from the previous enrollment status. If the previous 
+coverage year’s enrollment has any enrolled members, then the renewed enrollment will inherit their 
+confirmed status.  
+ 
+Note: The Exchange will not auto-effectuate enrollment if the current year enrollment is in pending state in 
+the Exchange System or if the renewal was done on a cross-Issuer plan.  
+ 
+ 
+ 
+ 
+14. Monthly Reconciliation 
+The Exchange’s reconciliation process is based on the FFM RCNI file. Details about this reconciliation process 
+is provided in document “Exchange-Issuer Reconciliation Guide v<version>.docx”. 
+The reconciliation process requirements are driven in part by how the Exchange’s system processes 
+enrollments. To facilitate and avoid reconciliation data discrepancies, the Exchange has a series of best 
+practices that Issuers should follow. Please refer to Section 6 “Enrollment Processes Impacting 
+Reconciliation” in document “Exchange-Issuer Reconciliation Guide v<version>.docx”. 
+ 
+ 
+
+
+--- PAGE 110 ---
+© GetInsured 2023 All Rights Reserved.         110 
+15. Relationship Codes 
+See below for the possible relationship codes / values for the INS02 element of the 2000 loop: 
+Table 30. INS02 Relationship Codes 
+Code Definition 
+01 Spouse 
+03 Father or Mother 
+04 Grandfather or Grandmother 
+05 Grandson or Granddaughter 
+06 Uncle or Aunt 
+07 Nephew or Niece 
+08 Cousin 
+09 Adopted Child 
+10 Foster Child 
+11 Son-in-law or Daughter –in-law 
+12 Brother-in-law or Sister-in-law 
+13 Mother-in-law or Father-in-law 
+14 Brother or Sister 
+15 Ward 
+16 Stepparent 
+17 Stepson or Stepdaughter 
+18 Self – This is the subscriber on the enrollment 
+19 Child 
+23 Sponsored Dependent – Dependent between the ages of 19 and 25 not 
+attending school; age qualifications may vary depending on policy 
+24 Dependent of a Minor Dependent 
+25 Ex-spouse 
+26 Guardian 
+31 Court Appointed Guardian 
+38 Collateral Dependent 
+53 Life Partner - This is a partner that acts like a spouse without a legal 
+marriage commitment 
+60 Annuitant 
+D2 Trustee 
+G8 Other Relationship 
+G9 Other Relative 
+
+--- PAGE 111 ---
+© GetInsured 2023 All Rights Reserved.         111 
+ 16. Maintenance Reason Codes 
+GetInsured supports all INS04 codes found in the CMS Standard Companion Guide Transaction v5.0 and the 
+ASC X12 Benefit Enrollment and Maintenance (834) transaction, based on the 005010X220 Implementation 
+Guide and its associated 005010X220A1 addenda. However, for user ease, the following are the values most 
+commonly used: 
+16.1. Term 
+Table 31. Termination Events INS04 Maintenance Reason Codes 
+Code Definition 
+01 Divorce 
+03 Death 
+07 Termination of Benefits 
+14 Voluntary Withdrawal 
+43 Change of Location 
+59 Non-Payment 
+AI No Reason Given 
+16.2. Add 
+Table 32. Add Events INS04 Maintenance Reason Codes 
+Code Definition 
+02 Birth 
+05 Adoption 
+22 Plan Change 
+32 Marriage 
+41 Re-enrollment 
+43 Change of Location 
+AI No Reason Given 
+EC Member Benefit Selection 
+16.3. Change 
+Table 33. Change Events INS04 Maintenance Reason Codes 
+Code Definition 
+25 Change in Identifying Data Elements 
+29 Benefit Selection 
+43 Change of Location 
+AI No Reason Given 
+ 
+
+--- PAGE 112 ---
+© GetInsured 2023 All Rights Reserved.         112 
+16.4. Inbound to Exchange 
+Table 34. Inbound Events INS04 Maintenance Reason Codes 
+Code Definition 
+28 Effectuation 
+59 Non-Payment 
+ 
+17. Language Codes 
+NISO values supported by Exchange (in general English or Spanish, unless expanded list requested by state 
+Exchange). The Exchange has the responsibility to manage which language codes are supported.  
+Note: For confirmation transaction, LUI segment is optional. If provided, the correct code should be 
+included. See Section 11.1 Initial Enrollment Supplemental Instructions, for details of LUI segment. 
+17.1 Spoken Language Codes 
+The Exchange may send the following NISO Z39.53 Language Codes for spoken language: 
+Table 35. Spoken Language LUI02 Language Identification Codes 
+NISO Code Language 
+ara Arabic 
+arm Armenian 
+cam Cambodian 
+chi Cantonese 
+chi Mandarin 
+eng English 
+hmn Hmong 
+kor Korean 
+per Farsi 
+rus Russian 
+spa Spanish 
+tag Tagalog 
+vie Vietnamese 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 113 ---
+© GetInsured 2023 All Rights Reserved.         113 
+17.2 Written Language Codes 
+The Exchange may send the following NISO Z39.53 Language Codes for written language: 
+Table 36. Written Language LUI02 Language Identification Codes 
+NISO Code Language 
+ara Arabic 
+arm Armenian 
+cam Cambodian 
+eng English 
+hmn Hmong 
+kor Korean 
+per Farsi 
+rus Russian 
+spa Spanish 
+tag Tagalog 
+vie Vietnamese 
+18. Race/Ethnicity Codes 
+The Exchange will send the following codes for race/ethnicity: 
+Table 37. Race and Ethnicity Codes 
+Code Race or Ethnicity 
+1002-5 American Indian or Alaskan Native 
+2029-7 Asian Indian 
+2054-5 Black or African American 
+2033-9 Cambodian 
+2034-7 Chinese 
+2182-4 Cuban 
+2036-2 Filipino 
+2086-7 Guamanian or Chamorro 
+2157-6 Guatemalan 
+2037-0 Hmong 
+2039-6 Japanese 
+2040-4 Korean 
+2041-2 Laotian 
+2148-5 Mexican, Mexican American or Chicano/a 
+2079-2 Native Hawaiian 
+2028-9 Other Asian 
+2135-2 Other Hispanic/Latino/Spanish 
+2500-7 Other Pacific Islander 
+2131-1 Other 
+2180-8 Puerto Rican 
+
+--- PAGE 114 ---
+© GetInsured 2023 All Rights Reserved.         114 
+2161-8 Salvadoran 
+2080-0 Samoan 
+2047-9 Vietnamese 
+2106-3 White 
+ 
+Note: If no value for Race/Ethnicity is selected, then no value will be sent to Issuers. 
+Note: For confirmation transaction, DMG segment is optional. However, if the Issuers choose to send it, 
+then the full segment should be populated with the available data. 
+  
+
+--- PAGE 115 ---
+© GetInsured 2023 All Rights Reserved.         115 
+19. Appendix 
+The following sample 834 file is representative of a typical transaction. Content will vary depending on 
+Exchange configuration settings and specific use case details. Displayed in unwrapped format for easier 
+viewing. 
+19.1. Initial Enrollment Sample - Exchange to Issuer 
+Use Case:  Initial enrollment to a Qualified Health Plan for a one-member household. 
+ISA*00*          *00*          *ZZ*AK0            *ZZ*990299999      *200625*0048*^*00501*000000001*1*T*:~ 
+GS*BE*AK0*990299999*20200625*0048*1*X*005010X220A1~ 
+ST*834*000000001*005010X220A1~ 
+BGN*00*9999920200625004713*20200625*004713****2~ 
+QTY*ET*1~ 
+QTY*DT*1~ 
+QTY*TO*2~ 
+N1*P5*John Doe*FI*999889999~ 
+N1*IN*Health Plan*FI*990299999~ 
+N1*BO*Jane Smith*FI*888998888~ 
+ACT*1234567~ 
+INS*Y*18*021*EC*A***AC~ 
+REF*0F*1000003285~ 
+REF*1L*888~ 
+REF*17*1000003285~ 
+REF*6O*AK00000000834~ 
+DTP*303*D8*20200624~ 
+NM1*IL*1*Doe*John****34*999889999~ 
+PER*IP**TE*9079999999*AP*9079999999*EM*John_123@yopmail.com~ 
+N3*Post box 11~ 
+N4*Anchorage*AK*99501**CY*02020~ 
+DMG*D8*19880317*M*R**1~ 
+HLH*N~ 
+LUI*LD*eng**6~ 
+LUI*LD*eng**7~ 
+NM1*31*1~ 
+N3*Post box 11~ 
+N4*Anchorage*AK*99501~ 
+HD*021**HLT~ 
+DTP*348*D8*20210101~ 
+REF*1L*888~ 
+REF*CE*99999AK003009405~ 
+REF*ZZ*7777~ 
+LS*2700~ 
+LX*1~ 
+N1*75*REQUEST SUBMIT TIMESTAMP~ 
+REF*17*2020062422450612~ 
+DTP*007*D8*20200624~ 
+LX*2~ 
+
+--- PAGE 116 ---
+© GetInsured 2023 All Rights Reserved.         116 
+N1*75*APTC AMT~ 
+REF*9V*55.00~ 
+DTP*007*D8*20210101~ 
+LX*3~ 
+N1*75*CSR AMT~ 
+REF*9V*44.00~ 
+DTP*007*D8*20210101~ 
+LX*4~ 
+N1*75*PRE AMT 1~ 
+REF*9X*200.00~ 
+DTP*007*D8*20210101~ 
+LX*5~ 
+N1*75*RATING AREA~ 
+REF*9X*R-AK001~ 
+DTP*007*D8*20210101~ 
+LX*6~ 
+N1*75*TOT RES AMT~ 
+REF*9V*145.00~ 
+DTP*007*D8*20210101~ 
+LX*7~ 
+N1*75*PRE AMT TOT~ 
+REF*9X*200.00~ 
+DTP*007*D8*20210101~ 
+LX*8~ 
+N1*75*SOURCE EXCHANGE ID~ 
+REF*17*AK0~ 
+DTP*007*D8*20210101~ 
+LX*9~ 
+N1*75*MONTHLY PRE AMT TOT~ 
+REF*9X*200.00~ 
+DTP*007*D8*20210101~ 
+LX*10~ 
+N1*75*MONTHLY APTC AMT~ 
+REF*9X*55.00~ 
+DTP*007*D8*20210101~ 
+LX*11~ 
+N1*75*MONTHLY TOT RES AMT~ 
+REF*9X*145.00~ 
+DTP*007*D8*20210101~ 
+<snip months 20210201 thru 20211101> 
+LX*42~ 
+N1*75*MONTHLY PRE AMT TOT~ 
+REF*9X*200.00~ 
+DTP*007*D8*20211201~ 
+LX*43~ 
+N1*75*MONTHLY APTC AMT~ 
+REF*9X*55.00~ 
+DTP*007*D8*20211201~ 
+LX*44~ 
+N1*75*MONTHLY TOT RES AMT~ 
+
+--- PAGE 117 ---
+© GetInsured 2023 All Rights Reserved.         117 
+REF*9X*145.00~ 
+DTP*007*D8*20211201~ 
+LE*2700~ 
+SE*210*000000001~ 
+GE*1*1~ 
+IEA*1*000000001~ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+--- PAGE 118 ---
+© GetInsured 2023 All Rights Reserved.         118 
+20. Document Control 
+Date Document 
+Version Revision Description Author 
+4/9/2019 R2019 Initial GetInsured 
+4/12/2019 R2019a 
+NV feedback: 
+ 
+● Clarification of benefit of using the 2750 loop during 
+the recon process 
+● Added note that CANCEL-NLE and TERM-OTH are not 
+supported by the Exchange 
+● Reiteration that the Exchange Assigned Policy ID 
+must always be sent 
+● Reiteration that the Exchange Assigned Member ID 
+must always be included when member level 
+information is sent 
+● Corrected typo for 343 to be the "Premium Paid To 
+Date End" 
+● Clarified re-enrollment and reinstatement 
+● Corrected subscriber identification of dependent-
+only policy 
+● Clarification of REF 6O 
+GetInsured 
+4/18/2019 R2019b 
+MN feedback: 
+● Removed content that consumer is auto renewed on 
+their already effectuated enrollment 
+● Confirmed that eligibility end date will be present on 
+Exchange initiated cancellations 
+● Added that REF*ZZ (client ID) household case ID info 
+will be included in all transactions initiated by the 
+Exchange 
+● Clarified that monthly premium loops will include 
+cancel transactions 
+● Added SEP REASON loop detail to the table for initial 
+enrollments 
+● Added SEP reason explanation to the Exchange to 
+Issuer Business Scenarios 
+● Added notes to the file naming convention 
+GetInsured 
+04/18/2019 R2019c Added GS06 detail GetInsured 
+
+--- PAGE 119 ---
+© GetInsured 2023 All Rights Reserved.         119 
+Date Document 
+Version Revision Description Author 
+Corrected Reinstatement section to include  
+07/22/2019 R2019d 
+MN feedback: 
+● Added note on cancelling/terming members within a 
+household 
+● Updated information regarding the monthly 
+premium fields 
+GetInsured 
+11/21/2019 R2019e Removed an erroneous note that the Old Policy isn’t sent for 
+dependents. GetInsured 
+6/11/2020 v20.09.00 
+Removed all references to SHOP market 
+Added notations where the Exchange usage differs from 
+CMS v4.3 834. 
+Section 9 added clarification for ST02 usage 
+Section 11.1 updated for 20.9 release to Responsible Person 
+usage, Mailing Address usage, 2750 loop ATPC AMT usage, 
+and additional of 2000 level REF02 ‘4A’ for Exchange 
+Assigned Enrollee Identifier. 
+GetInsured 
+7/15/2020 v20.09.01 
+Updated section 7, segment terminator clarification, section 
+9, GS02 description for clarification, section 12.2 added 
+clarification for configuration for confirm at member or 
+subscriber level, and section 13.1.6 added clarification for 
+configuration for add a member 
+GetInsured 
+7/28/2020 V20.09.02 Updated section 11.1 2100G Responsible Person description GetInsured 
+10/14/2020 v21.01.00 
+• General table clean up throughout document 
+• Clarification to section 5 
+• Update to section 9 to add footnote 
+• Updates/clarification section 10.1, 10.2 
+• Updates/clarification section 11.1 1000A N1 loop, 
+2750 Request Submit Timestamp, 2750 OTH AMT 1. 
+• Add sections 11.1.1 to 11.1.3 for 2750 standard and 
+custom monthly loops 
+• Updates section 11.1.2 custom 2750 loops, including 
+purpose statement, addition of state subsidy, 
+description of dates, and addition of MONTHLY 
+GetInsured 
+
+--- PAGE 120 ---
+© GetInsured 2023 All Rights Reserved.         120 
+Date Document 
+Version Revision Description Author 
+STATE SUBSIBY AMT loop. Add section 11.18 for 
+Incorrect Member description and loop detail 
+• Clarification section 11.9 for reinstatement 
+• Update section 11.14 to add clarification for death of 
+subscriber 
+• Addition of section 11.18 for Incorrect Member Loop 
+• Clarification section 12.1 for inbound rules 
+• Integrate Carrier Testing Mandatory Fields 
+document with addition of sections 12.1.1, 12.1.2, 
+12.2.1, 12.2.2, 12.3.1, 12.3.2, 12.4.1, and 12.4.2 
+• Clarification section 12.2 for manual renewal 
+• Update section 13.1 to remove reference to ‘REN’ 
+indicator 
+• Clarification section 13.1.2 for renewal file naming 
+• Updates section 13.1.5 to include MRC ‘22’ 
+• Update section 14 to reference renamed 
+reconciliation guide (carrier changed to Issuer). Add 
+reference to best practices found in reconciliation 
+guide. 
+• Added section 16.4 for inbound to Exchange MRC 
+• Added section 17 appendix with initial enrollment 
+sample. 
+Retitled Document Control from section 17 to section 18. 
+12/31/2020 v21.01.01 
+• Updated section 11.1 2100G Responsible Person 
+loop as configurable with 21.1 release. 
+• Updated section 11.1 2300 DTP to clarify:  
+o When 349 is sent on change transactions for 
+future dated terminations. 
+o Usage of 543 on outbound transactions. 
+• Removed inaccurate CMS guidance in section 12.4 
+• Correction section 13.1.3, RENP indicator is sent for 
+Add transaction. 
+• Updated section 15 to add relationship codes ‘09’, 
+‘38’, and ‘60 
+GetInsured 
+05/28/2021 v21.06.00 Not shown in v21.06.00 Tracked Changes GetInsured 
+
+--- PAGE 121 ---
+© GetInsured 2023 All Rights Reserved.         121 
+Date Document 
+Version Revision Description Author 
+• Updated references to CMS Companion Guide 
+version from 4.3 to 5.0 to entire document 
+• Added table numbers and heading to entire 
+document 
+• Reverted verbiage of “enrollee” back to “member”, 
+replaced “flag” with “indicator”, and capitalized 
+“Issuer” and “Exchange” to entire document for 
+consistency 
+Included in v21.06.00 Tracked Changes 
+• Updated section 9 to clarify validation of ISA13, and 
+add data element ISA15 
+• Updated section 11.1 2000 INS03 and INS04 REF 4A, 
+2100A DMG02, 2300 HD01, and HD03 to clarify 
+usage. Corrected 2300 DTP01 (indicated DTP03). 
+• Updated section 11.1 through 11.5 and 13.1.4 2300 
+REF X9 and REF ZZ to clarify usage. 
+• Updated section 11.1.1 table 5 for auto-renewal 
+indicators 
+• Updated section 11.7 to clarify usage and add a table 
+of scenarios and expected transactions 
+• Updated section 11.8 to clarify a “subscriber flip” 
+scenario for Re-enrollment 
+• Updated section 11.11 to clarify expected term and 
+re-enroll scenarios 
+• Updated section 11.16 for list of QLE Identifiers 
+• Updated section 12.1 ISA15 to clarify usage 
+• Updated section 12.2 to use CSR instead of CS for 
+Cost Sharing Reduction 
+• Updated section 12.2 to clarify usage of 2300 REF X9 
+• Updated section 12.3.1 and 12.4.1 to clarify usage of 
+2000 DTP 357 
+• Updated section 13.1.1 to clarify timing of 
+termination process for passive renewed 
+enrollments 
+06/07/2021 v21.06.01 Update section 12 for ISA15 behavior GetInsured 
+
+--- PAGE 122 ---
+© GetInsured 2023 All Rights Reserved.         122 
+Date Document 
+Version Revision Description Author 
+08/30/2021 v21.09.00 
+Update section 3, Table 1 for renaming of End of Year 
+termination, updated comments including footnote 
+numbering. 
+Update section 9, Table 3 for GS06 to clarify the requirement 
+for unique GS06 control numbers on inbound 834 
+transactions. 
+Update section 11: 
+• 11.1 update 2100A LUI02 to reference section 17 
+• 11.1 indicate “when applicable” for 2750 loops that 
+are conditionally sent 
+Update section 13: 
+• 13.1.1 for updated process for End of Coverage Year 
+Terms 
+• 13.1.3 to clarify usage 
+• 13.1.4 to update title and clarify usage of 024*07 
+termination transactions 
+• 13.1.5, table 25, 2000 loop INS04 to clarify usage 
+Update section 16.1 to add ‘59’ Non-Payment and remove 
+decommissioned ‘29’ Benefit Selection from Table 28 Term 
+maintenance reason codes. 
+Insert new section 17 with Table 31 for spoken and Table 32 
+for written language codes. Renumbered Appendix to 
+section 18 and Document Control to section 19. 
+GetInsured 
+09/01/2021 v21.09.01 Update Section 3 to reformat Table 1 GetInsured 
+11/29/2021 v22.01.00 Update Section 3, Table 1 column header content GetInsured 
+2/28/2022 v22.03.00 
+Update Section 13.1.6 to clarify add a member system 
+behavior for passive renewals 
+Insert Section 18 for Race/Ethnicity codes.  
+Renumber Section 18 Appendix to Section 19, and Section 19 
+Document Control to Section 20. 
+GetInsured 
+6/06/2022 v22.06.00 
+Overall formatting update to tables for consistent look 
+Removed reference to transaction 820 throughout 
+Update Section 3, Table 1 column header content  
+Updated <HIOS_Issuer_ID> with <HIOS ID> throughout to 
+clarify expected content. 
+GetInsured 
+
+--- PAGE 123 ---
+© GetInsured 2023 All Rights Reserved.         123 
+Date Document 
+Version Revision Description Author 
+Update Section 5: 
+• Section 5.1. Add clarifying content, example, and 
+add tables for TA1 segments and supported codes  
+• Section 5.2. Add example, and table for 999 
+segments 
+Update Section 9, Added TA1/999 validation information to 
+EDI Control Segments table 
+Update Section 10,  Eliminate obsolete reference to FFM 
+Update Section 11.1.:  
+• 1000A N1*P5 description to clarify sponsor logic. 
+• 2000 loop REF*6O description to clarify origin and 
+usage. 
+• 2000 loop REF*4A description with link to Section 
+11.8.1. Re-enrollment Gap in Coverage 
+• 2100A loop DMG04 Marital Status description to 
+clarify usage. 
+• 2100F Custodial Parent loop description updated ‘S8’ 
+to ‘S3’ to correct qualifier value 
+• 2100G Responsible Person loop description updated, 
+and link added to Section 11.1.4. Child Only 
+Enrollment 
+• Updated Section 11.1.3. Table 10 source for APTC 
+date 
+• Added Section 11.1.4. Child Only Enrollment  
+• Updates Section 11.8. Re-enrollment Gap in 
+Coverage and Table 17 to clarify MRC 
+Update Section 12: 
+• Section 12.1. To clarify inbound validations 
+• Section 12.2.1, 12.3.1, and 12.4.1 To add inbound 
+validations 
+• Section 12.3.2. and 12.4.2. To include optional 
+N1*BO and ACT segments for clarity 
+Updated Section 13.1.1. To clarify default behavior 
+Updated Section 18 To show in Table format for consistency 
+06/14/2022 v22.06.01 
+Update Section 3, Table 1 column header content  
+Updated <HIOS_ID> with <HIOS ID> throughout to clarify 
+expected content. 
+GetInsured 
+
+--- PAGE 124 ---
+© GetInsured 2023 All Rights Reserved.         124 
+Date Document 
+Version Revision Description Author 
+Update Section 5: 
+• Section 5.1. Corrected typo to 834  
+• Section 5.2. Added introduction for 999 section and 
+corrected typo for 999 report 
+Update Section 11.14 to clarify exception scenario 
+Section 12.2.2., 12.3.2. and 12.4.2. To include REF*4A 
+segment for clarity and update N/U - Not Used to E - Exclude 
+to reflect expected behavior of REF*4A for inbounds. 
+08/31/2023 v23.9.00 
+Overall updating to include description of code values where 
+they are missing in segment or element rows. 
+Update Section 3 to add Passive (Auto) Renewal file. 
+Update Section 11: 
+• Section 11.1 1000A Sponsor name updated for 
+clarity that Household Contact name is always 
+populated. 
+• Section 11.1 2100A/2100G PER, update usage of TE, 
+AP, and remove note that (BN) is not used. 
+• Section 11.1 DTP*303 description for clarity, 2750 
+loops for REQUEST SUBMIT TIMESTAMP to expand 
+to 16 positions, and to add 2750 loop for AGENT 
+BROKER INFO 
+• Section 11.1.1 to add Date in DTP03 column for all 
+listed entries. Separated ADDL MAINT REASON 
+entries for clarity, adding AGENT BROKER INFO, and 
+removed values not used APPLICATION ID AND 
+ORGIN.  
+• Section 11.6 to correct possible additional 
+maintenance reason code values. 
+• Section 11.9 updated for clarity 
+• Add Section 11.19 for Agent Broker delegation and 
+information Changes. 
+Update Section 12: 
+• Section 12.2.1., 12.2.2., 12.3.1., 12.3.2., 12.4.1. and 
+12.4.2. To update inbound REF*23 and REF*ZZ 
+requirement from Mandatory to Highly 
+Recommended and optional length of REQUEST 
+SUBMIT TIMESTAMP 
+GetInsured 
+
+--- PAGE 125 ---
+© GetInsured 2023 All Rights Reserved.         125 
+Date Document 
+Version Revision Description Author 
+• Section 12.3.1., 12.3.2., 12.4.1. and 12.4.2. To 
+update inbound DTP*349 requirement from 
+Mandatory to Optional, where DTP*349 is optional, 
+and configurable by state for length of REQUEST 
+SUBMIT TIMESTAMP 
+Update Section 13: 
+• Section 13.1.1, 13.1.4 to update EOY term behavior. 
+• Section 13.1.2, 13.1.5 to update Passive (Auto) 
+Renewal file behavior 
+Update Section 15: 
+• Clarify usage of ‘18’ for the subscriber of the 
+enrollment 
+ 

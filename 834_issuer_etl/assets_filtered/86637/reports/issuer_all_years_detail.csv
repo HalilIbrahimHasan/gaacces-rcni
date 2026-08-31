@@ -1,0 +1,3 @@
+issuer,year,month,insurance_type,policy_id,member_id,subscriber_id_x,health_coverage_policy_no,exchg_assigned_enrollee_id,household_or_employee_case_id,issuer_subscriber_identifier_x,issuer_indiv_identifier,normalized_status,event_date,action_code,source_table,record_key,coverage_year_month,file_event_year_month,collapsed_event_count
+86637,2026,02,HEALTH,P100,M100,S100,,E100,HH100,ISS-S100,ISS-M100,ENROLLED,2026-02-01,021,xml,86637|P100|M100|HEALTH|2026|01,2026-01,2026-02,1
+86637,2026,02,HEALTH,P100,M101,S100,,E101,,,,ENROLLED,2026-02-01,001,xml,86637|P100|M101|HEALTH|2026|01,2026-01,2026-02,1

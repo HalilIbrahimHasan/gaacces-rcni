@@ -1,0 +1,3 @@
+issuer,enrollment_id,enrollee_id,insurance_type,canonical_status,benefit_effective_date,benefit_end_date,coverage_year,snapshot_month,lifecycle_replayed_event_count,source_files
+86637,P100,M100,HEALTH,ENROLLED,2026-02-01,2026-12-31,2026,01,1,smoke_sample.xml
+86637,P100,M101,HEALTH,ENROLLED,2026-02-01,2026-12-31,2026,01,1,smoke_sample.xml
