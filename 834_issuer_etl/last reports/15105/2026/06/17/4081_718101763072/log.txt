@@ -1,0 +1,16 @@
+mkdir /opt/tibco/data/inProcess/4081_718101763072
+Started processing the outbound file: /opt/tibco/data/fromGHIX/X220A1/to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT
+Renaming file to match file naming convention expected by the trading partner.
+mv /opt/tibco/data/inProcess/4081_718101763072/to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT /opt/tibco/data/inProcess/4081_718101763072/to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT.good
+Copying the file to the carrier interface at 2026-06-17T03:33:28...
+cp /opt/tibco/data/inProcess/4081_718101763072/to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT.good /gaprd-hix/opt/sftp/Carriers/15105/out
+
+Renaming the file at the target interface at 2026-06-17T03:33:28
+to remove the suffix from the filename so it can get picked up...
+mv /gaprd-hix/opt/sftp/Carriers/15105/out/to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT.good /gaprd-hix/opt/sftp/Carriers/15105/out/to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT
+Archiving the inProcess workfolder data at 2026-06-17T03:33:28...
+mkdir -p /opt/tibco/data/archive/out/good/PAS/15105/2026/06/17
+mv /opt/tibco/data/inProcess/4081_718101763072 /opt/tibco/data/archive/out/good/PAS/15105/2026/06/17
+INFO: HIOS_Issuer_ID 15105 (Cigna HealthCare of Georgia Inc)
+File "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260617063214.OUT" from directory /opt/tibco/data/inProcess/4081_718101763072 moved to /opt/tibco/data/archive/out/good/PAS/15105/2026/06/17.
+

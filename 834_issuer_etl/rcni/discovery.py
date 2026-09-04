@@ -6,10 +6,14 @@ from dataclasses import dataclass, field
 
 from ingestion.sftp_filters import partition_matches
 from ingestion.sftp_ingestion import enumerate_remote_partitions, print_partition_diagnostics
-from ingestion.sftp_tree_walk import RemoteFileEntry, walk_remote_files_with_stats
+from ingestion.sftp_tree_walk import (
+    RemoteFileEntry,
+    trace_remote_tree,
+    walk_remote_files_with_stats,
+)
 from rcni.archive_path import ArchivePathMetadata, parse_archive_path
 from rcni.filename import RcniFilenameMetadata, parse_rcni_filename
-from rcni.matcher import is_rcni_sftp_archive_file, logical_filename
+from rcni.matcher import logical_filename, rcni_sftp_reject_reason
 from rcni.settings import RcniScope
 from utils.logger import get_logger
 
@@ -49,9 +53,15 @@ class DiscoveryResult:
     files_scanned: int = 0
     errors: list[str] = field(default_factory=list)
     partition_diagnostics: list = field(default_factory=list)
+    listing_trace_lines: list[str] = field(default_factory=list)
 
 
-def discover_rcni_candidates(sftp, scope: RcniScope) -> DiscoveryResult:
+def discover_rcni_candidates(
+    sftp,
+    scope: RcniScope,
+    *,
+    trace_listing: bool = False,
+) -> DiscoveryResult:
     """
     1. list_remote_partitions (existing 834 issuer/year/month selection)
     2. recursive walk of ALL descendants under the month directory
@@ -80,10 +90,32 @@ def discover_rcni_candidates(sftp, scope: RcniScope) -> DiscoveryResult:
     for issuer, year, month in partitions:
         month_norm = str(int(month)).zfill(2) if month.isdigit() else month
         month_path = f"{scope.base_path.rstrip('/')}/{issuer}/{year}/{month}"
+        if trace_listing:
+            print("\n======== RAW SFTP TREE (before matcher) ========")
+            trace = trace_remote_tree(
+                sftp, month_path, reject_reason=rcni_sftp_reject_reason
+            )
+            result.listing_trace_lines.extend(trace.lines)
+            print("======== END RAW SFTP TREE ========\n")
+            print(
+                f"TRACE {issuer}/{year}/{month_norm}: "
+                f"folders_visited={trace.folders_visited} "
+                f"files_seen_before_matcher={trace.files_seen_before_matcher} "
+                f"files_accepted_by_matcher={trace.files_accepted_by_matcher} "
+                f"files_rejected_by_matcher={trace.files_rejected_by_matcher}"
+            )
         files, stats = walk_remote_files_with_stats(sftp, month_path)
         result.folders_scanned += stats.folders_scanned
         result.files_scanned += stats.files_scanned
         result.errors.extend(stats.errors)
+        logger.info(
+            "Production walk %s/%s/%s folders=%d files_scanned=%d",
+            issuer,
+            year,
+            month_norm,
+            stats.folders_scanned,
+            stats.files_scanned,
+        )
 
         for entry in files:
             _classify_entry(result, entry, scope, issuer, year, month_norm)
@@ -135,8 +167,9 @@ def _classify_entry(
         issuer_mismatch=issuer_mismatch,
     )
 
-    if not is_rcni_sftp_archive_file(entry.filename):
-        candidate.skipped_reason = "not_rcni_monthly_discrepancy"
+    reject_reason = rcni_sftp_reject_reason(entry.filename)
+    if reject_reason is not None:
+        candidate.skipped_reason = reject_reason
         result.skipped.append(candidate)
         return
 

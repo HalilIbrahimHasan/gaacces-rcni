@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import stat as statmod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Iterator
+from typing import Any, Iterator, TextIO
 
 from ingestion.sftp_file_classifier import classify_sftp_filename, local_xml_name_from_remote
 from utils.logger import get_logger
@@ -287,6 +289,252 @@ def walk_remote_files_with_stats(
 
     files = list(_walk_remote_files(sftp, start_path, depth=0, stats=stats))
     return files, stats
+
+
+def _entry_type_label(entry) -> str:
+    is_dir = _is_dir_attr(entry)
+    if is_dir is True:
+        return "directory"
+    if is_dir is False:
+        return "file"
+    return "unknown"
+
+
+def _safe_listing_names(entries: list, *, from_strings: bool = False) -> list[str]:
+    names: list[str] = []
+    for entry in entries:
+        name = entry if from_strings else getattr(entry, "filename", None)
+        if not name or name in {".", ".."}:
+            continue
+        names.append(name)
+    return names
+
+
+def probe_listing_apis(sftp, path: str) -> dict[str, Any]:
+    """
+    Call listdir / listdir_attr / listdir_iter independently.
+
+    Do not union the results. Errors are recorded per API so a truncated
+    READDIR can be attributed to a specific method.
+    """
+    result: dict[str, Any] = {
+        "path": path,
+        "listdir": [],
+        "listdir_error": None,
+        "listdir_attr": [],
+        "listdir_attr_error": None,
+        "listdir_iter": [],
+        "listdir_iter_error": None,
+    }
+
+    if hasattr(sftp, "listdir"):
+        try:
+            result["listdir"] = [
+                name for name in sftp.listdir(path) if name not in {".", ".."}
+            ]
+        except Exception as exc:  # noqa: BLE001 — diagnostic must show the raw API failure
+            result["listdir_error"] = f"{type(exc).__name__}: {exc}"
+    else:
+        result["listdir_error"] = "listdir not available"
+
+    if hasattr(sftp, "listdir_attr"):
+        try:
+            result["listdir_attr"] = list(sftp.listdir_attr(path))
+        except Exception as exc:  # noqa: BLE001
+            result["listdir_attr_error"] = f"{type(exc).__name__}: {exc}"
+    else:
+        result["listdir_attr_error"] = "listdir_attr not available"
+
+    if hasattr(sftp, "listdir_iter"):
+        try:
+            try:
+                iterator = sftp.listdir_iter(path, read_aheads=50)
+            except TypeError:
+                iterator = sftp.listdir_iter(path)
+            try:
+                result["listdir_iter"] = list(iterator)
+            finally:
+                close = getattr(iterator, "close", None)
+                if callable(close):
+                    close()
+        except Exception as exc:  # noqa: BLE001
+            result["listdir_iter_error"] = f"{type(exc).__name__}: {exc}"
+    else:
+        result["listdir_iter_error"] = "listdir_iter not available"
+
+    return result
+
+
+def _print_probe(probe: dict[str, Any], emit: Callable[[str], None]) -> None:
+    listdir_names = probe["listdir"]
+    attr_entries = probe["listdir_attr"]
+    iter_entries = probe["listdir_iter"]
+    attr_names = _safe_listing_names(attr_entries)
+    iter_names = _safe_listing_names(iter_entries)
+
+    emit(f"REMOTE DIR: {probe['path']}")
+    emit(
+        "LISTING COUNTS: "
+        f"listdir()={len(listdir_names)}"
+        f"{'' if not probe['listdir_error'] else ' ERROR=' + probe['listdir_error']}  "
+        f"listdir_attr()={len(attr_names)}"
+        f"{'' if not probe['listdir_attr_error'] else ' ERROR=' + probe['listdir_attr_error']}  "
+        f"listdir_iter()={len(iter_names)}"
+        f"{'' if not probe['listdir_iter_error'] else ' ERROR=' + probe['listdir_iter_error']}"
+    )
+
+    # Print every raw attr-bearing entry (attr and iter). Names-only listdir
+    # rows are included when they did not appear in attr/iter.
+    printed: set[str] = set()
+    for source, entries, from_strings in (
+        ("listdir_attr", attr_entries, False),
+        ("listdir_iter", iter_entries, False),
+        ("listdir", listdir_names, True),
+    ):
+        for entry in entries:
+            if from_strings:
+                name = entry
+                mode = None
+                size = None
+                kind = "unknown"
+            else:
+                name = getattr(entry, "filename", None)
+                mode = getattr(entry, "st_mode", None)
+                size = getattr(entry, "st_size", None)
+                kind = _entry_type_label(entry)
+            if not name or name in {".", ".."}:
+                continue
+            key = f"{source}:{name}"
+            if key in printed:
+                continue
+            printed.add(key)
+            full_path = f"{probe['path'].rstrip('/')}/{name}"
+            emit("ENTRY:")
+            emit(f"name={name}")
+            emit(f"type={kind}")
+            emit(f"mode={mode if mode is not None else ''}")
+            emit(f"size={size if size is not None else ''}")
+            emit(f"full_path={full_path}")
+            emit(f"api={source}")
+
+
+def _stat_is_dir(sftp, path: str) -> bool | None:
+    try:
+        attr = sftp.stat(path)
+    except OSError:
+        return None
+    mode = getattr(attr, "st_mode", None)
+    if mode is None:
+        return None
+    return bool(statmod.S_ISDIR(mode))
+
+
+@dataclass
+class ListingTraceResult:
+    folders_visited: int = 0
+    files_seen_before_matcher: int = 0
+    files_accepted_by_matcher: int = 0
+    files_rejected_by_matcher: int = 0
+    rejected: list[tuple[str, str]] = field(default_factory=list)
+    accepted: list[str] = field(default_factory=list)
+    lines: list[str] = field(default_factory=list)
+
+
+def trace_remote_tree(
+    sftp,
+    start_path: str,
+    *,
+    reject_reason,
+    file: TextIO | None = None,
+) -> ListingTraceResult:
+    """
+    Print the complete raw tree under start_path before matcher filtering.
+
+    Each directory is probed with listdir / listdir_attr / listdir_iter
+    independently (no union). Recursion uses any name that any API returned
+    plus a follow-up stat() so a wrong st_mode cannot hide child folders.
+    """
+    result = ListingTraceResult()
+
+    def emit(line: str) -> None:
+        result.lines.append(line)
+        print(line)
+        if file is not None:
+            file.write(line + "\n")
+
+    emit("ROOT:")
+    emit(start_path)
+    emit("")
+
+    def _walk(path: str) -> None:
+        result.folders_visited += 1
+        probe = probe_listing_apis(sftp, path)
+        _print_probe(probe, emit)
+
+        child_names: dict[str, Any] = {}
+        for entry in probe["listdir_attr"] + probe["listdir_iter"]:
+            name = getattr(entry, "filename", None)
+            if name and name not in {".", ".."}:
+                child_names[name] = entry
+        for name in probe["listdir"]:
+            if name not in child_names:
+                child_names[name] = type("Ent", (), {"filename": name, "st_mode": None})()
+
+        files: list[str] = []
+        dirs: list[str] = []
+        for name, entry in sorted(child_names.items()):
+            full_path = f"{path.rstrip('/')}/{name}"
+            listing_kind = _entry_type_label(entry)
+            st_dir = _stat_is_dir(sftp, full_path)
+            emit(
+                f"CLASSIFY: name={name} listing_type={listing_kind} "
+                f"stat_isdir={st_dir if st_dir is not None else 'stat-failed'}"
+            )
+            is_dir = st_dir if st_dir is not None else (listing_kind == "directory" or listing_kind == "unknown")
+            if is_dir:
+                dirs.append(name)
+            else:
+                files.append(name)
+
+        emit(
+            f"DIR SUMMARY: path={path} unique_names={len(child_names)} "
+            f"classified_dirs={len(dirs)} classified_files={len(files)}"
+        )
+        emit("")
+
+        for filename in files:
+            result.files_seen_before_matcher += 1
+            reason = reject_reason(filename)
+            if reason is None:
+                result.files_accepted_by_matcher += 1
+                result.accepted.append(f"{path.rstrip('/')}/{filename}")
+            else:
+                result.files_rejected_by_matcher += 1
+                result.rejected.append((filename, reason))
+                emit("REJECTED FILE:")
+                emit(filename)
+                emit(f"reason={reason}")
+                emit("")
+
+        for subdir in dirs:
+            _walk(f"{path.rstrip('/')}/{subdir}")
+
+    try:
+        sftp.stat(start_path)
+    except OSError as exc:
+        emit(f"ROOT STAT FAILED: {start_path} ({exc})")
+        return result
+
+    _walk(start_path)
+    emit(f"folders_visited={result.folders_visited}")
+    emit(f"files_seen_before_matcher={result.files_seen_before_matcher}")
+    emit(f"files_accepted_by_matcher={result.files_accepted_by_matcher}")
+    emit(f"files_rejected_by_matcher={result.files_rejected_by_matcher}")
+    if result.accepted:
+        emit("ACCEPTED FILES:")
+        for path in result.accepted:
+            emit(f"  {path}")
+    return result
 
 
 def _walk_remote_files(

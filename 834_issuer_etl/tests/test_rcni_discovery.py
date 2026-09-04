@@ -11,6 +11,7 @@ from rcni.matcher import (
     is_rcni_local_file,
     is_rcni_monthly_discrepancy_file,
     is_rcni_sftp_archive_file,
+    rcni_sftp_reject_reason,
 )
 from rcni.settings import RcniScope, resolve_rcni_scope
 from rcni.staging import staging_paths
@@ -146,28 +147,29 @@ class TestRcniDiscoveryFilters:
             "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717000000.OUT.good.gz",
             "to_15105_INDV_MONTHLYDISCREPANCY_2025_20260717005653.OUT.good.gz",
             "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good.gz",
+            "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good",
             "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717111111.OUT.good.gz",
         }
         skipped_names = {c.filename for c in result.skipped}
         assert "log.txt.gz" in skipped_names
         assert "from_15105_INDV_MONTHLYRECON_2026_20260716080716.IN.gz" in skipped_names
-        assert "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good" in skipped_names
+        assert "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good" in names
+        assert "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good" not in skipped_names
         assert all(c.processing_month == "07" for c in result.candidates)
         assert all(c.issuer == "15105" for c in result.candidates)
 
-    def test_live_sftp_rejects_decompressed_out_good(self) -> None:
-        assert not is_rcni_sftp_archive_file(
-            "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good"
-        )
-        assert is_rcni_local_file(
-            "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good"
-        )
-        assert is_rcni_monthly_discrepancy_file(
-            "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good.gz"
-        )
-        assert not is_rcni_monthly_discrepancy_file(
-            "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good"
-        )
+    def test_live_sftp_accepts_compressed_and_uncompressed(self) -> None:
+        gz = "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good.gz"
+        plain = "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good"
+        assert is_rcni_sftp_archive_file(gz)
+        assert is_rcni_sftp_archive_file(plain)
+        assert is_rcni_local_file(gz)
+        assert is_rcni_local_file(plain)
+        assert is_rcni_monthly_discrepancy_file(gz)
+        assert is_rcni_monthly_discrepancy_file(plain)
+        assert is_rcni_monthly_discrepancy_file(plain, require_gzip=True)
+        assert rcni_sftp_reject_reason(gz) is None
+        assert rcni_sftp_reject_reason(plain) is None
 
     def test_does_not_select_august_when_month_is_july(self) -> None:
         sftp = FakeSFTP(_sample_tree())
@@ -218,6 +220,7 @@ class TestRcniDiscoveryFilters:
         assert month_root[0].nested_relative is None or month_root[0].nested_relative == ""
 
     def test_env_filters_used_when_cli_omitted(self, monkeypatch) -> None:
+        monkeypatch.setattr("config.config.reload_env", lambda: True)
         monkeypatch.setenv("ISSUER_FILTER", "15105")
         monkeypatch.setenv("YEAR_FILTER", "2026")
         monkeypatch.setenv("MONTH_FILTER", "07")
@@ -359,3 +362,33 @@ class TestRcniDiscoveryFilters:
         months = {m.zfill(2) if m.isdigit() else m for _, _, m in partitions}
         assert "01" in months and "02" in months
         assert {"03", "07", "08"} <= months
+
+
+class TestListingApiProbe:
+    def test_probe_reports_each_api_independently(self) -> None:
+        from ingestion.sftp_tree_walk import probe_listing_apis
+
+        sftp = FakeSFTP(_sample_tree())
+        probe = probe_listing_apis(sftp, "/archive/out/good/PAS/15105/2026/07")
+        assert probe["listdir_error"] is None
+        assert probe["listdir_attr_error"] is None
+        assert probe["listdir_iter_error"] is None
+        assert set(probe["listdir"]) == {"17", "nested_no_day", "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717000000.OUT.good.gz"}
+        assert {e.filename for e in probe["listdir_attr"]} == set(probe["listdir"])
+        assert {e.filename for e in probe["listdir_iter"]} == set(probe["listdir"])
+
+    def test_trace_finds_july_rcni_before_production_walk(self) -> None:
+        sftp = FakeSFTP(_sample_tree())
+        result = discover_rcni_candidates(
+            sftp, _scope(), trace_listing=True
+        )
+        assert result.listing_trace_lines
+        assert any(line.startswith("ROOT:") for line in result.listing_trace_lines)
+        assert any("LISTING COUNTS:" in line for line in result.listing_trace_lines)
+        accepted = [c.filename for c in result.candidates]
+        assert "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good.gz" in accepted
+        assert "to_15105_INDV_MONTHLYDISCREPANCY_2025_20260717005653.OUT.good.gz" in accepted
+        skipped = {c.filename: c.skipped_reason for c in result.skipped}
+        assert skipped["log.txt.gz"] == "log artifact"
+        assert skipped["from_15105_INDV_MONTHLYRECON_2026_20260716080716.IN.gz"] == "inbound from_ prefix"
+        assert "to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717005507.OUT.good" in accepted

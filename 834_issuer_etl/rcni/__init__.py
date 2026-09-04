@@ -1,1 +1,1 @@
-"""RCNI Monthly Discrepancy discovery and validation (Phase 1 — no SQL)."""
+"""RCNI Monthly Discrepancy — Phase 1 validation + Phase 2 raw ingest (no Azure exec)."""

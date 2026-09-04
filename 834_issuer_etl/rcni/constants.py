@@ -18,7 +18,14 @@ RCNI_DECOMPRESSED_SUFFIX: Final = ".OUT.good"
 # Rejected populations / artifacts (checked after the positive matcher).
 REJECT_DIRECTION_PREFIX: Final = "from_"
 REJECT_RECON_TOKEN: Final = "_INDV_MONTHLYRECON_"
-REJECT_LOG_NAMES: Final = frozenset({"log.txt", "log.txt.gz", "log.txt.xz"})
+REJECT_LOG_NAMES: Final = frozenset(
+    {
+        "log.txt",
+        "log.txt.gz",
+        "log.txt.xz",
+        "last-status-outbound-log.txt",
+    }
+)
 
 EXPECTED_HEADER: Final = (
     "Exchange Assigned Policy ID",
@@ -92,3 +99,39 @@ STRUCTURAL_ISSUE_TYPES: Final = frozenset(
     }
 )
 IDENTIFIER_ISSUE_TYPES: Final = frozenset({ISSUE_IDENTIFIER_NOT_NUMERIC})
+
+# Phase 2 file-log processing_status values (pipeline outcome).
+FILE_STATUS_DISCOVERED: Final = "DISCOVERED"
+FILE_STATUS_DOWNLOADING: Final = "DOWNLOADING"
+FILE_STATUS_DOWNLOADED: Final = "DOWNLOADED"
+FILE_STATUS_VALIDATING: Final = "VALIDATING"
+FILE_STATUS_LOADING: Final = "LOADING"
+FILE_STATUS_SUCCESS: Final = "SUCCESS"
+FILE_STATUS_FAILED: Final = "FAILED"
+FILE_STATUS_SKIPPED_DUPLICATE: Final = "SKIPPED_DUPLICATE"
+
+LOADED_FILE_STATUSES: Final = frozenset({FILE_STATUS_SUCCESS})
+
+# Phase 2 file_disposition values (logical identity class). Independent of
+# processing_status. A replacement that loaded is SUCCESS + POSSIBLE_REPLACEMENT.
+FILE_DISPOSITION_NEW: Final = "NEW"
+FILE_DISPOSITION_DUPLICATE: Final = "DUPLICATE"
+FILE_DISPOSITION_POSSIBLE_REPLACEMENT: Final = "POSSIBLE_REPLACEMENT"
+
+# Phase 2 data-quality issue_code values (stored in dbo.rcni_data_quality_issue).
+DQ_COLUMN_COUNT_MISMATCH: Final = "COLUMN_COUNT_MISMATCH"
+DQ_UNQUOTED_COMMA: Final = "UNQUOTED_COMMA"
+DQ_BROKEN_QUOTE: Final = "BROKEN_QUOTE"
+DQ_MULTILINE_FIELD: Final = "MULTILINE_FIELD"
+DQ_ENCODING_ISSUE: Final = "ENCODING_ISSUE"
+DQ_IDENTIFIER_FORMAT_WARNING: Final = "IDENTIFIER_FORMAT_WARNING"
+DQ_HEADER_MISMATCH: Final = "HEADER_MISMATCH"
+DQ_SCHEMA_DRIFT: Final = "SCHEMA_DRIFT"
+DQ_COUNT_MISMATCH: Final = "COUNT_MISMATCH"
+DQ_OTHER: Final = "OTHER"
+
+DOCUMENT_TYPE_RCNI: Final = "INDV_MONTHLYDISCREPANCY"
+QUALITY_STATUS_CLEAN: Final = "CLEAN"
+QUALITY_STATUS_WARNING: Final = "WARNING"
+
+DEFAULT_RCNI_AZURE_BATCH_SIZE: Final = 3000

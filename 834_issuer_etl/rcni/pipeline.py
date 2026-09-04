@@ -147,11 +147,24 @@ def run_discover_only(scope: RcniScope) -> Phase1Result:
         scope.sftp_user,
         scope.sftp_password,
     ) as sftp:
-        discovery = discover_rcni_candidates(sftp, scope)
-
-    inventory_rows = [_candidate_inventory_row(c) for c in discovery.candidates]
+        discovery = discover_rcni_candidates(
+            sftp,
+            scope,
+            trace_listing=bool(scope.month_allow) and len(scope.month_allow) == 1,
+        )
     print_candidate_inventory(inventory_rows)
     inventory_path = write_discovery_inventory(scope.reports_dir, inventory_rows)
+    report_paths = {
+        "discovery_inventory": str(inventory_path),
+    }
+    if discovery.listing_trace_lines:
+        trace_text = "\n".join(discovery.listing_trace_lines) + "\n"
+        trace_path = scope.reports_dir / "listing_trace.txt"
+        trace_path.write_text(trace_text, encoding="utf-8")
+        last_reports_trace = Path(__file__).resolve().parents[1] / "last reports" / "listing_trace.txt"
+        last_reports_trace.parent.mkdir(parents=True, exist_ok=True)
+        last_reports_trace.write_text(trace_text, encoding="utf-8")
+        report_paths["listing_trace"] = str(trace_path)
     manifest = write_run_manifest(
         scope.reports_dir,
         {
@@ -167,12 +180,13 @@ def run_discover_only(scope: RcniScope) -> Phase1Result:
             "files_by_processing_month": _counts_by_month(discovery.candidates),
         },
     )
+    report_paths["manifest"] = str(manifest)
     return Phase1Result(
         scope=scope,
         mode="discover-only",
         discovery=discovery,
         inventory_rows=inventory_rows,
-        report_paths={"discovery_inventory": str(inventory_path), "manifest": str(manifest)},
+        report_paths=report_paths,
     )
 
 

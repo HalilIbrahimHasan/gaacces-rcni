@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from datetime import datetime
 
 from rcni.filename import parse_rcni_filename
@@ -9,6 +11,7 @@ from rcni.matcher import (
     is_recon_input_file,
     is_rcni_sftp_archive_file,
     logical_filename,
+    rcni_sftp_reject_reason,
 )
 
 
@@ -57,13 +60,41 @@ class TestRcniFilenameParsing:
         assert not is_rcni_monthly_discrepancy_file("log.txt.gz")
         assert not is_rcni_monthly_discrepancy_file("log.txt")
 
-    def test_decompressed_allowed_locally_not_on_sftp(self) -> None:
-        name = "to_15105_INDV_MONTHLYDISCREPANCY_2025_20260717005653.OUT.good"
-        assert is_rcni_local_file(name)
-        assert not is_rcni_sftp_archive_file(name)
+    def test_decompressed_and_compressed_are_both_valid_source_forms(self) -> None:
+        gz = "to_15105_INDV_MONTHLYDISCREPANCY_2025_20260717005653.OUT.good.gz"
+        plain = "to_15105_INDV_MONTHLYDISCREPANCY_2025_20260717005653.OUT.good"
+        assert is_rcni_local_file(plain)
+        assert is_rcni_sftp_archive_file(plain)
+        assert is_rcni_sftp_archive_file(gz)
+        assert rcni_sftp_reject_reason(plain) is None
+        assert rcni_sftp_reject_reason(gz) is None
+
+    def test_reject_reason_from_prefix(self) -> None:
+        name = "from_15105_INDV_MONTHLYRECON_2025_20260116070119.IN.gz"
+        assert rcni_sftp_reject_reason(name) == "inbound from_ prefix"
+
+    def test_reject_reason_log(self) -> None:
+        assert rcni_sftp_reject_reason("log.txt.gz") == "log artifact"
+        assert rcni_sftp_reject_reason("log.txt") == "log artifact"
+        assert rcni_sftp_reject_reason("last-status-outbound-log.txt") == "log artifact"
 
     def test_all_good_files_are_not_accepted(self) -> None:
         assert not is_rcni_monthly_discrepancy_file("to_15105_OTHER_2026_20260717005507.OUT.good.gz")
+
+    def test_local_15105_tree_has_fourteen_rcni_files(self) -> None:
+        from rcni.profile_local import discover_local_rcni_files
+
+        tree = Path(__file__).resolve().parents[1] / "last reports" / "15105" / "2026"
+        if not tree.is_dir():
+            return
+        files = discover_local_rcni_files(tree)
+        assert len(files) == 14
+        suffixes = {p.name[p.name.rfind(".OUT") :] for p in files}
+        assert suffixes == {".OUT.good", ".OUT.good.gz"}
+        assert any(p.name.endswith(".OUT.good.gz") for p in files)
+        assert any(p.name.endswith(".OUT.good") and not p.name.endswith(".gz") for p in files)
+        assert not any("log.txt" in p.name.lower() for p in files)
+        assert not any(p.name.startswith("from_") for p in files)
 
     def test_issuer_and_timestamp_extraction(self) -> None:
         meta = parse_rcni_filename(
