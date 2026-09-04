@@ -16,6 +16,7 @@ from rcni.constants import (
     STATUS_MALFORMED,
     STATUS_SCHEMA_MISMATCH,
     STATUS_WARNING,
+    STRUCTURAL_ISSUE_TYPES,
 )
 from rcni.csv_validator import CsvValidationResult, RowIssue, validate_rcni_csv
 from rcni.discovery import DiscoveryResult, RcniCandidate, discover_rcni_candidates
@@ -26,9 +27,10 @@ from rcni.matcher import is_rcni_local_file, logical_filename
 from rcni.reports import (
     FileValidationSummary,
     print_candidate_inventory,
+    write_data_quality_warnings,
     write_discovery_inventory,
-    write_malformed_evidence,
     write_run_manifest,
+    write_structural_malformed,
     write_validation_summary,
 )
 from rcni.settings import RcniScope
@@ -162,6 +164,7 @@ def run_discover_only(scope: RcniScope) -> Phase1Result:
             "files_scanned": discovery.files_scanned,
             "folders_scanned": discovery.folders_scanned,
             "partitions": [f"{a}/{b}/{c}" for a, b, c in discovery.partitions],
+            "files_by_processing_month": _counts_by_month(discovery.candidates),
         },
     )
     return Phase1Result(
@@ -171,6 +174,22 @@ def run_discover_only(scope: RcniScope) -> Phase1Result:
         inventory_rows=inventory_rows,
         report_paths={"discovery_inventory": str(inventory_path), "manifest": str(manifest)},
     )
+
+
+def _counts_by_month(candidates: list[RcniCandidate]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for candidate in candidates:
+        key = candidate.processing_month or "?"
+        counts[key] = counts.get(key, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def _write_issue_reports(
+    reports_dir: Path, issues: list[RowIssue]
+) -> tuple[str, str]:
+    structural_path = write_structural_malformed(reports_dir, issues)
+    warnings_path = write_data_quality_warnings(reports_dir, issues)
+    return str(structural_path), str(warnings_path)
 
 
 def _summarize_file(
@@ -187,9 +206,24 @@ def _summarize_file(
     schema_status = STATUS_CLEAN if csv_result.header_ok else STATUS_SCHEMA_MISMATCH
     if not csv_result.header_ok:
         flags.append(STATUS_SCHEMA_MISMATCH)
-    if csv_result.malformed_records:
         flags.append(STATUS_MALFORMED)
-    if csv_result.identifier_warnings:
+    if csv_result.structural_malformed_records or csv_result.malformed_records:
+        flags.append(STATUS_MALFORMED)
+    if csv_result.identifier_format_warnings or csv_result.identifier_warnings:
+        flags.append(STATUS_WARNING)
+
+    other_quality = 0
+    for issue in issues:
+        if (
+            issue.issue_type not in STRUCTURAL_ISSUE_TYPES
+            and issue.issue_type != "DOWNLOAD_ERROR"
+            and issue.issue_type not in {"IDENTIFIER_NOT_NUMERIC"}
+        ):
+            other_quality += 1
+    if extra_flags:
+        # DOWNLOAD_ERROR is structural.
+        pass
+    if other_quality:
         flags.append(STATUS_WARNING)
 
     filename_status = (
@@ -212,8 +246,15 @@ def _summarize_file(
         header_column_count=csv_result.header_column_count,
         parsed_records=csv_result.parsed_records,
         clean_records=csv_result.clean_records,
-        malformed_records=csv_result.malformed_records,
-        identifier_warnings=csv_result.identifier_warnings,
+        malformed_records=csv_result.structural_malformed_records or csv_result.malformed_records,
+        identifier_warnings=csv_result.identifier_format_warnings or csv_result.identifier_warnings,
+        structural_malformed_records=(
+            csv_result.structural_malformed_records or csv_result.malformed_records
+        ),
+        identifier_format_warnings=(
+            csv_result.identifier_format_warnings or csv_result.identifier_warnings
+        ),
+        other_quality_warnings=other_quality,
         schema_header_status=schema_status,
         filename_metadata_status=filename_status,
         overall_status=overall_status(flags),
@@ -310,7 +351,7 @@ def run_discover_and_validate(scope: RcniScope) -> Phase1Result:
         summary.overall_status = overall_status(summary.flags)
 
     summary_path = write_validation_summary(scope.reports_dir, summaries)
-    evidence_path = write_malformed_evidence(scope.reports_dir, all_issues)
+    structural_path, warnings_path = _write_issue_reports(scope.reports_dir, all_issues)
     manifest = write_run_manifest(
         scope.reports_dir,
         {
@@ -321,6 +362,15 @@ def run_discover_and_validate(scope: RcniScope) -> Phase1Result:
             "month": scope.month_display,
             "candidates": len(discovery.candidates),
             "files_validated": len(summaries),
+            "partitions": [f"{a}/{b}/{c}" for a, b, c in discovery.partitions],
+            "files_by_processing_month": _counts_by_month(discovery.candidates),
+            "structural_malformed_records": sum(
+                s.structural_malformed_records for s in summaries
+            ),
+            "identifier_format_warnings": sum(
+                s.identifier_format_warnings for s in summaries
+            ),
+            "other_quality_warnings": sum(s.other_quality_warnings for s in summaries),
             "azure_sql_writes": False,
             "source_files_modified": False,
         },
@@ -336,7 +386,8 @@ def run_discover_and_validate(scope: RcniScope) -> Phase1Result:
         report_paths={
             "discovery_inventory": str(inventory_path),
             "validation_summary": str(summary_path),
-            "malformed_records": str(evidence_path),
+            "structural_malformed": structural_path,
+            "data_quality_warnings": warnings_path,
             "manifest": str(manifest),
         },
     )
@@ -364,7 +415,9 @@ def _print_validation_table(summaries: list[FileValidationSummary]) -> None:
         print(
             f"  csv    : header_cols={item.header_column_count}  "
             f"parsed={item.parsed_records}  clean={item.clean_records}  "
-            f"malformed={item.malformed_records}  id_warnings={item.identifier_warnings}"
+            f"structural_malformed={item.structural_malformed_records}  "
+            f"id_format_warnings={item.identifier_format_warnings}  "
+            f"other_warnings={item.other_quality_warnings}"
         )
         print(
             f"  schema={item.schema_header_status}  "
@@ -372,6 +425,12 @@ def _print_validation_table(summaries: list[FileValidationSummary]) -> None:
         )
     print("-" * 120)
     print(f"Files validated: {len(summaries)}")
+    print(
+        "Totals: structural_malformed="
+        f"{sum(s.structural_malformed_records for s in summaries)}  "
+        f"identifier_format_warnings={sum(s.identifier_format_warnings for s in summaries)}  "
+        f"other_quality_warnings={sum(s.other_quality_warnings for s in summaries)}"
+    )
     print("Azure SQL writes: NONE")
     print("Source files modified: NO")
 
@@ -465,13 +524,20 @@ def run_validate_local(scope: RcniScope, local_dir: Path) -> Phase1Result:
             summary.overall_status = overall_status(summary.flags)
 
     summary_path = write_validation_summary(scope.reports_dir, summaries)
-    evidence_path = write_malformed_evidence(scope.reports_dir, all_issues)
+    structural_path, warnings_path = _write_issue_reports(scope.reports_dir, all_issues)
     manifest = write_run_manifest(
         scope.reports_dir,
         {
             "mode": "validate-local",
             "local_dir": str(local_dir),
             "candidates": len(candidates),
+            "structural_malformed_records": sum(
+                s.structural_malformed_records for s in summaries
+            ),
+            "identifier_format_warnings": sum(
+                s.identifier_format_warnings for s in summaries
+            ),
+            "other_quality_warnings": sum(s.other_quality_warnings for s in summaries),
             "azure_sql_writes": False,
             "source_files_modified": False,
         },
@@ -487,7 +553,8 @@ def run_validate_local(scope: RcniScope, local_dir: Path) -> Phase1Result:
         report_paths={
             "discovery_inventory": str(inventory_path),
             "validation_summary": str(summary_path),
-            "malformed_records": str(evidence_path),
+            "structural_malformed": structural_path,
+            "data_quality_warnings": warnings_path,
             "manifest": str(manifest),
         },
     )

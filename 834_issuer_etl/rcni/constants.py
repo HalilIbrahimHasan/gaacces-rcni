@@ -44,14 +44,13 @@ EXPECTED_HEADER: Final = (
 
 EXPECTED_COLUMN_COUNT: Final = len(EXPECTED_HEADER)
 
-# Identifiers are stored as strings. Non-empty non-digit values are warnings,
-# not parser crashes. HIX Value / Issuer Value are intentionally excluded.
+# Exchange Assigned Member/Subscriber IDs: companion guide requires 10 numeric
+# characters (REF*17 / REF*0F). Issuer-assigned IDs may be alphanumeric.
+# Exchange Assigned Policy ID (REF*1L) is mandatory but is not given a numeric
+# character rule in the companion guide, so it is not numeric-checked.
 NUMERIC_IDENTIFIER_COLUMNS: Final = (
-    "Exchange Assigned Policy ID",
     "Exchange Assigned Member ID",
-    "Issuer Assigned Member ID",
     "Exchange Assigned Subscriber ID",
-    "Issuer Assigned Subscriber ID",
 )
 
 HIX_VALUE_COLUMN: Final = "HIX Value"
@@ -84,3 +83,12 @@ ISSUE_FILENAME_UNPARSEABLE: Final = "FILENAME_UNPARSEABLE"
 ISSUE_DUPLICATE_COPY: Final = "DUPLICATE_COPY"
 ISSUE_POSSIBLE_REPLACEMENT: Final = "POSSIBLE_REPLACEMENT"
 ISSUE_PARSE_ERROR: Final = "PARSE_ERROR"
+
+STRUCTURAL_ISSUE_TYPES: Final = frozenset(
+    {
+        ISSUE_HEADER_MISMATCH,
+        ISSUE_FIELD_COUNT,
+        ISSUE_PARSE_ERROR,
+    }
+)
+IDENTIFIER_ISSUE_TYPES: Final = frozenset({ISSUE_IDENTIFIER_NOT_NUMERIC})

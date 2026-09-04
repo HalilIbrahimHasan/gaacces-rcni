@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from rcni.constants import STRUCTURAL_ISSUE_TYPES
 from rcni.csv_validator import RowIssue
 from utils.logger import get_logger
 
@@ -32,6 +33,9 @@ class FileValidationSummary:
     clean_records: int
     malformed_records: int
     identifier_warnings: int
+    structural_malformed_records: int
+    identifier_format_warnings: int
+    other_quality_warnings: int
     schema_header_status: str
     filename_metadata_status: str
     overall_status: str
@@ -102,6 +106,9 @@ def write_validation_summary(
         "clean_records",
         "malformed_records",
         "identifier_warnings",
+        "structural_malformed_records",
+        "identifier_format_warnings",
+        "other_quality_warnings",
         "schema_header_status",
         "filename_metadata_status",
         "overall_status",
@@ -115,24 +122,54 @@ def write_validation_summary(
     return path
 
 
+_ISSUE_FIELDS = [
+    "source_file",
+    "source_path",
+    "record_number",
+    "physical_line_number",
+    "expected_column_count",
+    "observed_column_count",
+    "issue_code",
+    "issue_type",
+    "issue_description",
+    "column_name",
+    "bad_value",
+    "raw_record",
+]
+
+
+def _issue_row(issue: RowIssue) -> dict[str, Any]:
+    row = asdict(issue)
+    row["issue_code"] = issue.issue_type
+    return row
+
+
 def write_malformed_evidence(reports_dir: Path, issues: list[RowIssue]) -> Path:
-    path = reports_dir / "malformed_records.csv"
-    rows = [asdict(issue) for issue in issues]
-    fields = [
-        "source_file",
-        "source_path",
-        "record_number",
-        "physical_line_number",
-        "issue_type",
-        "issue_description",
-        "expected_column_count",
-        "observed_column_count",
-        "column_name",
-        "bad_value",
-        "raw_record",
+    """Backward-compatible name: writes structural malformed rows only."""
+    return write_structural_malformed(reports_dir, issues)
+
+
+def write_structural_malformed(reports_dir: Path, issues: list[RowIssue]) -> Path:
+    path = reports_dir / "structural_malformed.csv"
+    rows = [
+        _issue_row(issue)
+        for issue in issues
+        if issue.issue_type in STRUCTURAL_ISSUE_TYPES or issue.issue_type == "DOWNLOAD_ERROR"
     ]
-    _write_csv(path, rows, fields)
-    logger.info("Wrote malformed evidence: %s (%d issue(s))", path, len(rows))
+    _write_csv(path, rows, _ISSUE_FIELDS)
+    logger.info("Wrote structural malformed evidence: %s (%d row(s))", path, len(rows))
+    return path
+
+
+def write_data_quality_warnings(reports_dir: Path, issues: list[RowIssue]) -> Path:
+    path = reports_dir / "data_quality_warnings.csv"
+    rows = [
+        _issue_row(issue)
+        for issue in issues
+        if issue.issue_type not in STRUCTURAL_ISSUE_TYPES and issue.issue_type != "DOWNLOAD_ERROR"
+    ]
+    _write_csv(path, rows, _ISSUE_FIELDS)
+    logger.info("Wrote data-quality warnings: %s (%d row(s))", path, len(rows))
     return path
 
 

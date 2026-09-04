@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+from ingestion.sftp_ingestion import list_remote_partitions
 from ingestion.sftp_filters import filters_from_settings, parse_csv_filter, partition_matches
 from rcni.archive_path import parse_archive_path
 from rcni.constants import DEFAULT_RCNI_BASE_PATH, FORBIDDEN_INBOUND_PATH_FRAGMENT
@@ -41,6 +42,9 @@ class FakeSFTP:
         dirs, files = self._node(path)
         return [FakeAttr(name, True) for name in dirs] + [FakeAttr(name, False) for name in files]
 
+    def listdir_iter(self, path: str = ".", read_aheads: int = 50):
+        yield from self.listdir_attr(path)
+
     def stat(self, path: str):
         path = path.rstrip("/") or "/"
         if path in self.tree:
@@ -59,7 +63,20 @@ def _sample_tree() -> dict[str, tuple[list[str], list[str]]]:
     return {
         root: (["15105", "37301"], []),
         f"{root}/15105": (["2026"], []),
-        f"{root}/15105/2026": (["07", "08"], []),
+        f"{root}/15105/2026": (["01", "02", "03", "07", "08"], []),
+        f"{root}/15105/2026/01": (
+            [],
+            ["to_15105_INDV_MONTHLYDISCREPANCY_2026_20260116000000.OUT.good.gz"],
+        ),
+        f"{root}/15105/2026/02": (
+            [],
+            ["to_15105_INDV_MONTHLYDISCREPANCY_2026_20260216000000.OUT.good.gz"],
+        ),
+        f"{root}/15105/2026/03": (["deep_batch"], []),
+        f"{root}/15105/2026/03/deep_batch": (
+            [],
+            ["to_15105_INDV_MONTHLYDISCREPANCY_2026_20260315000000.OUT.good.gz"],
+        ),
         f"{root}/15105/2026/07": (
             ["17", "nested_no_day"],
             ["to_15105_INDV_MONTHLYDISCREPANCY_2026_20260717000000.OUT.good.gz"],
@@ -271,3 +288,74 @@ class TestRcniDiscoveryFilters:
         assert not is_rcni_sftp_archive_file(
             "from_15105_INDV_MONTHLYRECON_2026_20260716080716.IN.gz"
         )
+
+    def test_all_month_filter_enumerates_every_month_directory(self) -> None:
+        sftp = FakeSFTP(_sample_tree())
+        result = discover_rcni_candidates(
+            sftp, _scope(month_allow=None, issuer_allow={"15105"}, year_allow={"2026"})
+        )
+        months = {c.processing_month for c in result.candidates}
+        assert months == {"01", "02", "03", "07", "08"}
+        partitions = list_remote_partitions(
+            sftp, "/archive/out/good/PAS", {"15105"}, {"2026"}, None
+        )
+        partition_months = {m.zfill(2) if m.isdigit() else m for _, _, m in partitions}
+        assert partition_months == {"01", "02", "03", "07", "08"}
+
+    def test_month_03_and_later_are_discovered(self) -> None:
+        sftp = FakeSFTP(_sample_tree())
+        result = discover_rcni_candidates(
+            sftp, _scope(month_allow=None, issuer_allow={"15105"}, year_allow={"2026"})
+        )
+        assert any(c.processing_month == "03" for c in result.candidates)
+        assert any(c.filename.endswith("20260315000000.OUT.good.gz") for c in result.candidates)
+        assert any(c.processing_month == "07" for c in result.candidates)
+        assert any(c.processing_month == "08" for c in result.candidates)
+
+    def test_recursive_walk_under_each_selected_month(self) -> None:
+        sftp = FakeSFTP(_sample_tree())
+        result = discover_rcni_candidates(
+            sftp, _scope(month_allow=None, issuer_allow={"15105"}, year_allow={"2026"})
+        )
+        nested_july = [
+            c for c in result.candidates if c.filename.endswith("20260717111111.OUT.good.gz")
+        ]
+        nested_march = [
+            c for c in result.candidates if c.filename.endswith("20260315000000.OUT.good.gz")
+        ]
+        assert nested_july
+        assert nested_march
+        assert nested_march[0].nested_relative == "deep_batch"
+
+    def test_truncated_listdir_does_not_cap_months_at_two(self) -> None:
+        class TruncatingListdirSFTP(FakeSFTP):
+            def _year_truncated(self, path: str, dirs: list[str], files: list[str]):
+                name = path.rstrip("/").rsplit("/", 1)[-1]
+                if name.isdigit() and len(name) == 4 and len(dirs) > 2:
+                    return dirs[:2], files
+                return dirs, files
+
+            def listdir(self, path: str) -> list[str]:
+                dirs, files = self._year_truncated(path, *self._node(path))
+                return list(dirs) + list(files)
+
+            def listdir_attr(self, path: str) -> list[FakeAttr]:
+                dirs, files = self._year_truncated(path, *self._node(path))
+                return [FakeAttr(name, True) for name in dirs] + [
+                    FakeAttr(name, False) for name in files
+                ]
+
+            def listdir_iter(self, path: str = ".", read_aheads: int = 50):
+                dirs, files = self._node(path)
+                for name in dirs:
+                    yield FakeAttr(name, True)
+                for name in files:
+                    yield FakeAttr(name, False)
+
+        sftp = TruncatingListdirSFTP(_sample_tree())
+        partitions = list_remote_partitions(
+            sftp, "/archive/out/good/PAS", {"15105"}, {"2026"}, None
+        )
+        months = {m.zfill(2) if m.isdigit() else m for _, _, m in partitions}
+        assert "01" in months and "02" in months
+        assert {"03", "07", "08"} <= months

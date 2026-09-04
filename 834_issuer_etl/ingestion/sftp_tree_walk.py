@@ -10,6 +10,63 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+_DIR_MODE = 0o040000
+_MODE_MASK = 0o170000
+
+
+def _is_dir_attr(entry) -> bool | None:
+    mode = getattr(entry, "st_mode", None)
+    if mode is None:
+        return None
+    return (mode & _MODE_MASK) == _DIR_MODE
+
+
+def list_remote_attrs(sftp, path: str) -> list:
+    """
+    Complete directory listing.
+
+    Some SFTP servers return only the first READDIR batch (often two names)
+    unless further READDIR requests are pipelined. Union listdir_iter
+    (pipelined) with listdir_attr so month/year enumeration is not capped.
+    """
+    by_name: dict[str, Any] = {}
+
+    def _add(entry) -> None:
+        name = getattr(entry, "filename", None)
+        if not name or name in {".", ".."}:
+            return
+        by_name[name] = entry
+
+    if hasattr(sftp, "listdir_iter"):
+        try:
+            try:
+                iterator = sftp.listdir_iter(path, read_aheads=50)
+            except TypeError:
+                iterator = sftp.listdir_iter(path)
+            for entry in iterator:
+                _add(entry)
+        except OSError as exc:
+            logger.warning("listdir_iter failed for %s: %s", path, exc)
+        except EOFError:
+            pass
+
+    if hasattr(sftp, "listdir_attr"):
+        try:
+            for entry in sftp.listdir_attr(path):
+                _add(entry)
+        except OSError as exc:
+            logger.warning("listdir_attr failed for %s: %s", path, exc)
+
+    if not by_name and hasattr(sftp, "listdir"):
+        try:
+            for name in sftp.listdir(path):
+                _add(type("Ent", (), {"filename": name, "st_mode": None})())
+        except OSError as exc:
+            logger.warning("Cannot list directory %s: %s", path, exc)
+            return []
+
+    return list(by_name.values())
+
 
 @dataclass
 class PartitionWalkResult:
@@ -36,28 +93,22 @@ class PartitionWalkResult:
 
 
 def list_remote_dirs(sftp, path: str) -> list[str]:
-    try:
-        entries = sftp.listdir_attr(path)
-    except OSError as exc:
-        logger.warning("Cannot list directory %s: %s", path, exc)
-        return []
     dirs: list[str] = []
-    for entry in entries:
-        if entry.st_mode is not None and (entry.st_mode & 0o170000) == 0o040000:
-            dirs.append(entry.filename)
+    for entry in list_remote_attrs(sftp, path):
+        is_dir = _is_dir_attr(entry)
+        if is_dir is False:
+            continue
+        dirs.append(entry.filename)
     return sorted(dirs)
 
 
 def list_remote_files(sftp, path: str) -> list[str]:
-    try:
-        entries = sftp.listdir_attr(path)
-    except OSError as exc:
-        logger.warning("Cannot list directory %s: %s", path, exc)
-        return []
     files: list[str] = []
-    for entry in entries:
-        if entry.st_mode is None or (entry.st_mode & 0o170000) != 0o040000:
-            files.append(entry.filename)
+    for entry in list_remote_attrs(sftp, path):
+        is_dir = _is_dir_attr(entry)
+        if is_dir is True:
+            continue
+        files.append(entry.filename)
     return sorted(files)
 
 

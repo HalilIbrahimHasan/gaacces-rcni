@@ -1,0 +1,12 @@
+{
+  "mode": "validate",
+  "base_path": "/archive/out/good/PAS",
+  "issuer": "ALL",
+  "year": "[2026]",
+  "month": "ALL",
+  "candidates": 62,
+  "files_validated": 62,
+  "azure_sql_writes": false,
+  "source_files_modified": false,
+  "written_at": "2026-08-31T10:41:35.434808+00:00"
+}

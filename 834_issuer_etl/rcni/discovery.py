@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ingestion.sftp_filters import partition_matches
-from ingestion.sftp_ingestion import list_remote_partitions
+from ingestion.sftp_ingestion import enumerate_remote_partitions, print_partition_diagnostics
 from ingestion.sftp_tree_walk import RemoteFileEntry, walk_remote_files_with_stats
 from rcni.archive_path import ArchivePathMetadata, parse_archive_path
 from rcni.filename import RcniFilenameMetadata, parse_rcni_filename
@@ -48,6 +48,7 @@ class DiscoveryResult:
     folders_scanned: int = 0
     files_scanned: int = 0
     errors: list[str] = field(default_factory=list)
+    partition_diagnostics: list = field(default_factory=list)
 
 
 def discover_rcni_candidates(sftp, scope: RcniScope) -> DiscoveryResult:
@@ -57,7 +58,7 @@ def discover_rcni_candidates(sftp, scope: RcniScope) -> DiscoveryResult:
     3. keep files matching the live RCNI gzip matcher
     """
     result = DiscoveryResult()
-    partitions = list_remote_partitions(
+    partitions, diagnostics = enumerate_remote_partitions(
         sftp,
         scope.base_path,
         issuer_allow=scope.issuer_allow,
@@ -65,6 +66,8 @@ def discover_rcni_candidates(sftp, scope: RcniScope) -> DiscoveryResult:
         month_allow=scope.month_allow,
     )
     result.partitions = partitions
+    result.partition_diagnostics = diagnostics
+    print_partition_diagnostics(diagnostics)
     if not partitions:
         logger.warning(
             "No SFTP partitions matched issuer=%s year=%s month=%s under %s",

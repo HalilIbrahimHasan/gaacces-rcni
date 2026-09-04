@@ -47,6 +47,9 @@ class CsvValidationResult:
     clean_records: int = 0
     malformed_records: int = 0
     identifier_warnings: int = 0
+    structural_malformed_records: int = 0
+    identifier_format_warnings: int = 0
+    other_quality_warnings: int = 0
     issues: list[RowIssue] = field(default_factory=list)
     held_all_rows: bool = False
 
@@ -90,7 +93,9 @@ def validate_rcni_csv(
 
     Malformed rows are recorded and scanning continues.
     HIX Value / Issuer Value are never type-checked.
-    Identifier columns are string-validated as numeric-looking without conversion.
+    Identifier columns that are Exchange-assigned are string-validated as
+    numeric-looking without conversion. Issuer-assigned identifiers may be
+    alphanumeric and are not numeric-checked.
     """
     file_path = Path(path)
     display_name = source_file or file_path.name
@@ -199,6 +204,7 @@ def validate_rcni_csv(
                 record_number += 1
                 result.parsed_records += 1
                 result.malformed_records += 1
+                result.structural_malformed_records += 1
                 emit(
                     RowIssue(
                         source_file=display_name,
@@ -221,6 +227,7 @@ def validate_rcni_csv(
             observed = len(row)
             if observed != EXPECTED_COLUMN_COUNT:
                 result.malformed_records += 1
+                result.structural_malformed_records += 1
                 emit(
                     RowIssue(
                         source_file=display_name,
@@ -252,6 +259,7 @@ def validate_rcni_csv(
                     if not is_numeric_identifier(value):
                         row_has_identifier_warning = True
                         result.identifier_warnings += 1
+                        result.identifier_format_warnings += 1
                         emit(
                             RowIssue(
                                 source_file=display_name,
